@@ -42,18 +42,30 @@ function createLayerEl() {
 }
 
 function setupEventListeners() {
-    // Mode buttons
+    // Mode buttons - use both click and touchend for iPad Safari
     const brushBtn = document.getElementById('btn-brush');
-    if (brushBtn) brushBtn.addEventListener('click', () => setMode('brush'));
+    if (brushBtn) {
+        brushBtn.addEventListener('click', () => setMode('brush'));
+        brushBtn.addEventListener('touchend', e => { e.preventDefault(); setMode('brush'); });
+    }
     
     const eraserBtn = document.getElementById('btn-eraser');
-    if (eraserBtn) eraserBtn.addEventListener('click', () => setMode('eraser'));
+    if (eraserBtn) {
+        eraserBtn.addEventListener('click', () => setMode('eraser'));
+        eraserBtn.addEventListener('touchend', e => { e.preventDefault(); setMode('eraser'); });
+    }
     
     const smudgeBtn = document.getElementById('btn-smudge');
-    if (smudgeBtn) smudgeBtn.addEventListener('click', () => setMode('smudge'));
+    if (smudgeBtn) {
+        smudgeBtn.addEventListener('click', () => setMode('smudge'));
+        smudgeBtn.addEventListener('touchend', e => { e.preventDefault(); setMode('smudge'); });
+    }
     
     const layersBtn = document.getElementById('btn-layers');
-    if (layersBtn) layersBtn.addEventListener('click', toggleLayersPanel);
+    if (layersBtn) {
+        layersBtn.addEventListener('click', toggleLayersPanel);
+        layersBtn.addEventListener('touchend', e => { e.preventDefault(); toggleLayersPanel(); });
+    }
     
     // Sliders
     const sizeSlider = document.getElementById('size-slider');
@@ -66,16 +78,27 @@ function setupEventListeners() {
     canvasContainer.addEventListener('pointerdown', handlePointerDown);
     canvasContainer.addEventListener('pointermove', handlePointerMove);
     canvasContainer.addEventListener('pointerup', handlePointerUp);
+    canvasContainer.addEventListener('pointerleave', () => { isDrawing = false; });
+    canvasContainer.addEventListener('pointercancel', () => { isDrawing = false; });
     
     // Other buttons
     const undoBtn = document.getElementById('btn-undo');
-    if (undoBtn) undoBtn.addEventListener('click', () => alert('Undo'));
+    if (undoBtn) {
+        undoBtn.addEventListener('click', () => alert('Undo'));
+        undoBtn.addEventListener('touchend', e => { e.preventDefault(); alert('Undo'); });
+    }
     
     const redoBtn = document.getElementById('btn-redo');
-    if (redoBtn) redoBtn.addEventListener('click', () => alert('Redo'));
+    if (redoBtn) {
+        redoBtn.addEventListener('click', () => alert('Redo'));
+        redoBtn.addEventListener('touchend', e => { e.preventDefault(); alert('Redo'); });
+    }
     
     const exportBtn = document.getElementById('btn-export');
-    if (exportBtn) exportBtn.addEventListener('click', () => alert('Export'));
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => alert('Export'));
+        exportBtn.addEventListener('touchend', e => { e.preventDefault(); alert('Export'); });
+    }
 }
 
 function setMode(mode) {

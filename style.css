@@ -35,10 +35,25 @@
     -webkit-touch-callout: none;
 }
 
-/* Fix for touch - ensure buttons and inputs are clickable */
 .tool-btn, button, input {
     pointer-events: auto !important;
     -webkit-tap-highlight-color: rgba(255,255,255,0.3);
+    cursor: pointer !important;
+}
+
+/* iOS Safari fix - ensure buttons receive touch events */
+@supports (-webkit-touch-callout: none) {
+    .top-bar {
+        touch-action: manipulation !important;
+        -webkit-touch-callout: default !important;
+    }
+    .tool-btn {
+        -webkit-user-select: none !important;
+        user-select: none !important;
+    }
+    .canvas-wrapper {
+        -webkit-touch-callout: none !important;
+    }
 }
 
 /* iPad Optimization: GPU-accelerated canvas rendering */
@@ -244,12 +259,17 @@ body, html {
     box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
 }
 
-/* Main Workspace */
+/* Main Workspace - ensure pointer events flow to children */
 .workspace {
     flex: 1;
     display: flex;
     position: relative;
     overflow: hidden;
+    pointer-events: none;
+}
+
+.workspace > * {
+    pointer-events: auto;
 }
 
 /* Left Sidebar */
@@ -329,7 +349,7 @@ input[type=range].vertical-slider::-webkit-slider-thumb {
     font-size: 18px;
 }
 
-/* Canvas Area */
+/* Canvas Area - no touch-action to allow toolbar interaction */
 .canvas-wrapper {
     position: absolute;
     top: 0;
@@ -337,9 +357,8 @@ input[type=range].vertical-slider::-webkit-slider-thumb {
     right: 0;
     bottom: 0;
     overflow: hidden;
-    background-color: var(--bg-color); /* Dark background around canvas */
-    z-index: 10;
-    touch-action: none;
+    background-color: var(--bg-color);
+    z-index: 1;
 }
 
 .canvas-container {
