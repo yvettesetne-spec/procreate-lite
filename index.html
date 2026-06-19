@@ -1265,27 +1265,30 @@ window.toggleLayersPanel = function() {
 };
 window.setupUI = function() {
     const c = prompt('Color (hex):', window.brushColor || '#ffffff');
-    if (c) window.brushColor = c;
-    const ind = document.getElementById('current-color-indicator');
-    if (ind) ind.style.backgroundColor = window.brushColor;
+    if (c) {
+        window.brushColor = c;
+        const ind = document.getElementById('current-color-indicator');
+        if (ind) ind.style.backgroundColor = window.brushColor;
+        console.log('Color set:', c);
+    }
 };
 console.log('Inline handlers ready');
 </script>
 <script src="main.js?v=20240620"></script>
     <script>
-        console.log('main.js loaded:', typeof init);
-        alert('App loaded'); // Debug to confirm JS runs
-        // Global error handler for debug
-        window.addEventListener('error', (e) => {
-            const panel = document.getElementById('debug-panel');
-            if (panel) {
-                panel.style.display = 'block';
-                panel.textContent += (e.error ? e.error.message : e.message) + ' | ';
-            }
-        });
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(() => {});
-        }
+console.log('main.js loaded:', typeof init);
+// Global error handler for debug
+window.addEventListener('error', (e) => {
+    const panel = document.getElementById('debug-panel');
+    if (panel) {
+        panel.style.display = 'block';
+        panel.textContent += (e.error ? e.error.message : e.message) + ' | ';
+    }
+});
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+</script>
     </script>
 </body>
 </html>
