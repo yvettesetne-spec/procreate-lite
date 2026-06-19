@@ -43,6 +43,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid red !important;
 }
 .tool-btn i {
     pointer-events: auto !important;
