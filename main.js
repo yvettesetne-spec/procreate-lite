@@ -159,10 +159,15 @@ function toggleLayersPanel() {
 }
 
 async function boot() {
+    // Make setMode global for onclick handlers
+    window.setMode = setMode;
+    window.toggleLayersPanel = toggleLayersPanel;
+    
     if ('serviceWorker' in navigator) {
         try {
             const reg = await navigator.serviceWorker.register('/sw.js');
             await reg.update();
         } catch (e) { console.log('SW registration failed'); }
     }
+    console.log('Procreate Lite loaded - ready for iPad');
 }
