@@ -14,7 +14,6 @@ let isDrawing = false;
 let points = [];
 let smoothBuffer = [];
 let canvasContainer;
-let canvasPool = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     canvasContainer = document.getElementById('canvas-container');
@@ -43,19 +42,40 @@ function createLayerEl() {
 }
 
 function setupEventListeners() {
+    // Mode buttons
     const brushBtn = document.getElementById('btn-brush');
     if (brushBtn) brushBtn.addEventListener('click', () => setMode('brush'));
     
     const eraserBtn = document.getElementById('btn-eraser');
     if (eraserBtn) eraserBtn.addEventListener('click', () => setMode('eraser'));
     
+    const smudgeBtn = document.getElementById('btn-smudge');
+    if (smudgeBtn) smudgeBtn.addEventListener('click', () => setMode('smudge'));
+    
+    const layersBtn = document.getElementById('btn-layers');
+    if (layersBtn) layersBtn.addEventListener('click', toggleLayersPanel);
+    
+    // Sliders
     const sizeSlider = document.getElementById('size-slider');
     if (sizeSlider) sizeSlider.addEventListener('input', e => brushSize = parseInt(e.target.value));
     
-    // Canvas events
-    document.addEventListener('pointerdown', handlePointerDown);
-    document.addEventListener('pointermove', handlePointerMove);
-    document.addEventListener('pointerup', handlePointerUp);
+    const opacitySlider = document.getElementById('opacity-slider');
+    if (opacitySlider) opacitySlider.addEventListener('input', e => brushOpacity = parseInt(e.target.value) / 100);
+    
+    // Canvas drawing
+    canvasContainer.addEventListener('pointerdown', handlePointerDown);
+    canvasContainer.addEventListener('pointermove', handlePointerMove);
+    canvasContainer.addEventListener('pointerup', handlePointerUp);
+    
+    // Other buttons
+    const undoBtn = document.getElementById('btn-undo');
+    if (undoBtn) undoBtn.addEventListener('click', () => alert('Undo'));
+    
+    const redoBtn = document.getElementById('btn-redo');
+    if (redoBtn) redoBtn.addEventListener('click', () => alert('Redo'));
+    
+    const exportBtn = document.getElementById('btn-export');
+    if (exportBtn) exportBtn.addEventListener('click', () => alert('Export'));
 }
 
 function setMode(mode) {
@@ -66,7 +86,6 @@ function setMode(mode) {
 }
 
 function handlePointerDown(e) {
-    if (e.target.closest('.tool-btn') || e.target.closest('.panel')) return;
     const rect = canvasContainer.getBoundingClientRect();
     const pos = {
         x: (e.clientX - rect.left) / (rect.width / logicalWidth),
@@ -134,6 +153,11 @@ function updateColorIndicator() {
     if (indicator) indicator.style.backgroundColor = brushColor;
 }
 
+function toggleLayersPanel() {
+    const layersPanel = document.getElementById('layers-panel');
+    if (layersPanel) layersPanel.classList.toggle('hidden');
+}
+
 async function boot() {
     if ('serviceWorker' in navigator) {
         try {
@@ -141,5 +165,4 @@ async function boot() {
             await reg.update();
         } catch (e) { console.log('SW registration failed'); }
     }
-    console.log('Procreate Lite loaded - ready for iPad');
 }
