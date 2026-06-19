@@ -356,10 +356,10 @@ input[type=range].vertical-slider::-webkit-slider-thumb {
     font-size: 18px;
 }
 
-/* Canvas Area - no touch-action to allow toolbar interaction */
+/* Canvas Area - positioned below header */
 .canvas-wrapper {
     position: absolute;
-    top: 0;
+    top: 50px;
     left: 0;
     right: 0;
     bottom: 0;
