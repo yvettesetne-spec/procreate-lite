@@ -1242,11 +1242,22 @@
         <img id="ref-image-el" src="" alt="Referencia">
     </div>
 
-    <!-- Grid Overlay -->
+<!-- Grid Overlay -->
     <canvas id="grid-overlay-canvas" class="grid-overlay hidden"></canvas>
+
+    <!-- Debug Panel -->
+    <div id="debug-panel" style="position:fixed;bottom:0;left:0;right:0;background:#ff0000;color:#fff;padding:4px;font-size:10px;z-index:99999;max-height:100px;overflow:auto;display:none;"></div>
 
     <script src="main.js"></script>
     <script>
+        // Global error handler for debug
+        window.addEventListener('error', (e) => {
+            const panel = document.getElementById('debug-panel');
+            if (panel) {
+                panel.style.display = 'block';
+                panel.textContent += (e.error ? e.error.message : e.message) + ' | ';
+            }
+        });
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js').catch(() => {});
         }
