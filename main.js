@@ -19,7 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
     canvasContainer = document.getElementById('canvas-container');
     init();
     boot();
+    console.log('DOM loaded, buttons should work');
 });
+
+// Immediate test
+console.log('Script loaded at', Date.now());
 
 function init() {
     createLayerEl();

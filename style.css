@@ -40,6 +40,9 @@
     -webkit-tap-highlight-color: rgba(255,255,255,0.3);
     cursor: pointer !important;
 }
+.tool-btn i {
+    pointer-events: auto !important;
+}
 
 /* iOS Safari fix - ensure buttons receive touch events */
 @supports (-webkit-touch-callout: none) {

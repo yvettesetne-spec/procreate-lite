@@ -251,6 +251,12 @@
                 <button class="tool-btn color-btn-wrapper" id="btn-color" aria-label="Selector de color">
                     <div class="color-indicator" id="current-color-indicator"></div>
                 </button>
+<script>
+(function(){
+    const btns = ['brush','smudge','eraser','layers'];
+    btns.forEach(m=>{const b=document.getElementById('btn-'+m);if(b)b.ontouchend=function(e){e.preventDefault();window.setMode&&window.setMode(m);};});
+    const cb=document.getElementById('btn-color');if(cb)cb.ontouchend=function(e){e.preventDefault();window.setupUI&&window.setupUI();};
+})();</script>
             </div>
         </header>
 
