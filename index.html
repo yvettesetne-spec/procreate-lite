@@ -24,14 +24,14 @@
                 <button class="tool-btn text-btn" id="btn-gallery">Galeria</button>
             </div>
             <div class="top-bar-right" role="toolbar" aria-label="Herramientas principales">
-                <button class="tool-btn-style active" id="btn-brush" aria-label="Pincel" aria-pressed="true" onclick="event.stopPropagation();console.log('brush clicked');alert('brush mode');window.setMode('brush');return false;">Brush</button>
-                <button class="tool-btn-style" id="btn-smudge" aria-label="Difuminar" aria-pressed="false" onclick="event.stopPropagation();console.log('smudge clicked');alert('smudge mode');window.setMode('smudge');return false;">Smudge</button>
-                <button class="tool-btn-style" id="btn-eraser" aria-label="Borrador" aria-pressed="false" onclick="event.stopPropagation();console.log('eraser clicked');alert('eraser mode');window.setMode('eraser');return false;">Erase</button>
-                <button class="tool-btn-style" id="btn-layers" aria-label="Capas" aria-pressed="false" onclick="event.stopPropagation();console.log('layers clicked');window.toggleLayersPanel();return false;">Layers</button>
-                <button class="tool-btn-style color-btn-wrapper" id="btn-color" aria-label="Selector de color" onclick="event.stopPropagation();console.log('color clicked');window.setupUI();return false;">
-                    <div class="color-indicator" id="current-color-indicator"></div>
-                </button>
-            </div>
+<button class="tool-btn-style active" id="btn-brush" aria-label="Pincel" aria-pressed="true" onclick="event.stopPropagation();console.log('brush clicked');alert('brush mode');window.setMode('brush');return false;" onpointerdown="event.stopPropagation();event.preventDefault();console.log('brush pointer');window.setMode('brush');return false;">Brush</button>
+<button class="tool-btn-style" id="btn-smudge" aria-label="Difuminar" aria-pressed="false" onclick="event.stopPropagation();console.log('smudge clicked');alert('smudge mode');window.setMode('smudge');return false;" onpointerdown="event.stopPropagation();event.preventDefault();console.log('smudge pointer');window.setMode('smudge');return false;">Smudge</button>
+<button class="tool-btn-style" id="btn-eraser" aria-label="Borrador" aria-pressed="false" onclick="event.stopPropagation();console.log('eraser clicked');alert('eraser mode');window.setMode('eraser');return false;" onpointerdown="event.stopPropagation();event.preventDefault();console.log('eraser pointer');window.setMode('eraser');return false;">Erase</button>
+<button class="tool-btn-style" id="btn-layers" aria-label="Capas" aria-pressed="false" onclick="event.stopPropagation();console.log('layers clicked');window.toggleLayersPanel();return false;" onpointerdown="event.stopPropagation();event.preventDefault();window.toggleLayersPanel();return false;">Layers</button>
+<button class="tool-btn-style color-btn-wrapper" id="btn-color" aria-label="Selector de color" onclick="event.stopPropagation();console.log('color clicked');window.setupUI();return false;" onpointerdown="event.stopPropagation();event.preventDefault();window.setupUI();return false;">
+    <div class="color-indicator" id="current-color-indicator"></div>
+</button>
+</div>
         </header>
 
         <!-- Main Workspace -->
