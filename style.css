@@ -35,10 +35,14 @@
     -webkit-touch-callout: none;
 }
 
-.tool-btn, button, input {
+.tool-btn, .tool-btn-style, button, input {
     pointer-events: auto !important;
     -webkit-tap-highlight-color: rgba(255,255,255,0.3);
     cursor: pointer !important;
+    text-decoration: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .tool-btn i {
     pointer-events: auto !important;
