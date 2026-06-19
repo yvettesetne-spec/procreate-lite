@@ -107,9 +107,10 @@ function setupEventListeners() {
 
 function setMode(mode) {
     currentMode = mode;
-    document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tool-btn, .tool-btn-style').forEach(btn => btn.classList.remove('active'));
     const btn = document.getElementById(`btn-${mode}`);
     if (btn) btn.classList.add('active');
+    console.log('setMode called with:', mode);
 }
 
 function handlePointerDown(e) {
