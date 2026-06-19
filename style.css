@@ -142,12 +142,10 @@ body, html {
     position: relative;
 }
 
-/* Top Toolbar */
+/* Top Toolbar - no backdrop-filter for iOS Safari compatibility */
 .top-bar {
     height: 50px;
     background-color: var(--toolbar-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     display: flex;
     justify-content: space-between;
     align-items: center;
