@@ -1,0 +1,103 @@
+# Phase 6 — Fase 6: Procreate Lite
+
+## 8 Features + Stroke Improvement
+
+### 0. Smooth Stroke Rendering (Critical - Do First)
+**Problem:** Current brush draws straight line segments between pointer events, causing zigzag on freehand strokes with generic stylus.
+
+**Solution:** Replace `lineTo` with quadratic Bézier curves between midpoints:
+- For each 3 consecutive points, calculate the midpoint between point[i] and point[i+1]
+- Use `quadraticCurveTo(point[i].x, point[i].y, midX, midY)` 
+- This creates smooth curves that follow the user's hand naturally
+- Apply to all brushes: solid, pencil, airbrush, marker
+- Keep stabilization slider as additional smoothing on top
+
+**Files:** `main.js` — `draw()` function, brush rendering branches
+
+---
+
+### 1. Layer Masks
+- Add `maskData` (ImageData) to each layer object
+- Add `maskEnabled` boolean per layer
+- UI: mask button in layers panel (per layer)
+- Drawing on mask: grayscale — white = visible, black = hidden
+- Apply mask in `renderComposite()` using `globalCompositeOperation`
+- Export: flatten mask into layer on PNG export
+
+**Files:** `main.js` — layer object, `renderComposite()`, `createLayerEl()`, `renderLayersUI()`
+
+---
+
+### 2. Clipping Masks
+- Add `clippingMask` boolean per layer
+- When enabled, layer only shows where the layer below has content
+- In `renderComposite()`: render base layer first, then clipped layer using `globalCompositeOperation: 'source-in'`
+- UI: clipping mask toggle in layer actions
+
+**Files:** `main.js` — `renderComposite()`, layer object, `renderLayersUI()`
+
+---
+
+### 3. Blur / Filters
+- **Gaussian Blur:** Apply `ctx.filter = 'blur(Xpx)'` or manual convolution
+- **Box Blur:** Simple averaging convolution
+- Apply to active layer only
+- UI: filter panel with blur radius slider + apply button
+- Process: read layer pixels → apply kernel → write back
+
+**Files:** `main.js` — new filter functions, new UI panel in `index.html`
+
+---
+
+### 4. Hue / Saturation / Brightness
+- Convert layer pixels RGB → HSL, adjust H/S/L, convert back
+- Real-time preview with sliders
+- Apply on confirm
+- UI: panel with 3 sliders (Hue ±180°, Saturation 0-200%, Brightness 0-200%)
+
+**Files:** `main.js` — HSL conversion, adjustment function, new UI panel
+
+---
+
+### 5. Canvas Resize / Crop
+- **Resize:** Scale all layers to new dimensions using `drawImage` with scaling
+- **Crop:** Extract region from all layers, create new canvases
+- UI: drag handles on canvas edges for crop, or input dimensions for resize
+- Update `logicalWidth`/`logicalHeight` after operation
+
+**Files:** `main.js` — resize/crop functions, UI handles, `index.html` — crop overlay
+
+---
+
+### 6. Color Palettes
+- Save current color presets as named palettes
+- Store in IndexedDB
+- UI: palette section in color panel, save/load/delete palettes
+- Default palette: current 15 preset colors
+
+**Files:** `main.js` — palette CRUD, IndexedDB schema update, `index.html` — palette UI
+
+---
+
+### 7. Brush Studio
+- Per-brush customizable parameters:
+  - **Spacing:** distance between dots (currently fixed)
+  - **Scatter:** random offset from stroke path
+  - **Rotation:** brush angle
+  - **Jitter:** random size/opacity variation
+- Store per-brush settings in a `brushSettings` object
+- UI: expandable settings panel when brush is selected
+
+**Files:** `main.js` — brush settings object, updated dot rendering in `draw()`, `index.html` — brush studio panel
+
+---
+
+## Execution Order
+1. Smooth Stroke Rendering (improves core experience immediately)
+2. Color Palettes (simple, high value)
+3. Hue/Saturation (moderate complexity)
+4. Blur / Filters (moderate complexity)
+5. Layer Masks (complex, core Procreate feature)
+6. Clipping Masks (depends on composite rendering)
+7. Brush Studio (complex, touches brush engine)
+8. Canvas Resize / Crop (complex, touches all layers)

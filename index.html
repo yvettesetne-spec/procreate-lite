@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <!-- iPad 5th gen optimizations -->
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-title" content="Procreate Lite">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <title>Procreate Lite</title>
+    <link rel="manifest" href="manifest.json">
+    <!-- RemixIcons for a clean look similar to Procreate -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container" role="application" aria-label="Procreate Lite - Aplicación de dibujo">
+        <!-- Top Toolbar -->
+        <header class="top-bar" role="toolbar" aria-label="Barra de herramientas principal">
+            <div class="top-bar-left">
+                <button class="tool-btn text-btn" id="btn-gallery">Galeria</button>
+                <button class="tool-btn" id="btn-settings" title="Configuracion"><i class="ri-settings-3-line"></i></button>
+                <button class="tool-btn" id="btn-brush-library" title="Biblioteca de pinceles"><i class="ri-book-open-line"></i></button>
+                <button class="tool-btn" id="btn-timelapse-replay" title="Replay time-lapse"><i class="ri-play-circle-line"></i></button>
+                <span class="toolbar-separator"></span>
+                <!-- Export group -->
+                <button class="tool-btn" id="btn-export" title="Exportar PNG"><i class="ri-download-2-line"></i></button>
+                <button class="tool-btn" id="btn-export-jpeg" title="Exportar JPEG"><i class="ri-image-line"></i></button>
+                <button class="tool-btn" id="btn-export-psd" title="Exportar PSD"><i class="ri-file-zip-line"></i></button>
+                <button class="tool-btn" id="btn-export-pdf" title="Exportar PDF"><i class="ri-file-pdf-line"></i></button>
+                <button class="tool-btn" id="btn-import" title="Importar imagen"><i class="ri-image-add-line"></i></button>
+                <input type="file" id="import-file-input" accept="image/*" style="display:none">
+                <span class="toolbar-separator"></span>
+                <!-- Filters dropdown -->
+                <div class="toolbar-dropdown" id="dropdown-filters">
+                    <button class="tool-btn" id="btn-filters-toggle" title="Filtros"><i class="ri-magic-line"></i><i class="ri-arrow-down-s-line" style="font-size:10px"></i></button>
+                    <div class="toolbar-dropdown-menu hidden" id="filters-menu">
+                        <button class="dropdown-item" id="btn-sharpen"><i class="ri-focus-3-line"></i> Sharpen</button>
+                        <button class="dropdown-item" id="btn-blur"><i class="ri-blur-off-line"></i> Blur</button>
+                        <button class="dropdown-item" id="btn-motion-blur"><i class="ri-direction-line"></i> Motion Blur</button>
+                        <button class="dropdown-item" id="btn-radial-blur"><i class="ri-radish-line"></i> Radial Blur</button>
+                        <button class="dropdown-item" id="btn-unsharp"><i class="ri-focus-3-line"></i> Unsharp Mask</button>
+                        <button class="dropdown-item" id="btn-noise"><i class="ri-tornado-line"></i> Ruido</button>
+                        <button class="dropdown-item" id="btn-chromatic"><i class="ri-lens-line"></i> Aberracion Cromatica</button>
+                        <button class="dropdown-item" id="btn-vignette"><i class="ri-circle-line"></i> Vignette</button>
+                        <button class="dropdown-item" id="btn-film-grain"><i class="ri-film-line"></i> Film Grain</button>
+                        <button class="dropdown-item" id="btn-halftone"><i class="ri-brush-line"></i> Halftone</button>
+                        <button class="dropdown-item" id="btn-glitch"><i class="ri-bug-line"></i> Glitch</button>
+                        <button class="dropdown-item" id="btn-oil-paint"><i class="ri-paint-brush-line"></i> Oil Paint</button>
+                    </div>
+                </div>
+                <!-- Stabilization -->
+                <button class="tool-btn" id="btn-stabilizer" title="Estabilizacion de trazo"><i class="ri-rocket-line"></i></button>
+                <!-- Adjustments dropdown -->
+                <div class="toolbar-dropdown" id="dropdown-adjustments">
+                    <button class="tool-btn" id="btn-adjustments-toggle" title="Ajustes"><i class="ri-sun-line"></i><i class="ri-arrow-down-s-line" style="font-size:10px"></i></button>
+                    <div class="toolbar-dropdown-menu hidden" id="adjustments-menu">
+                        <button class="dropdown-item" id="btn-hsb"><i class="ri-sun-line"></i> HSB</button>
+                        <button class="dropdown-item" id="btn-levels"><i class="ri-gradient-line"></i> Niveles</button>
+                        <button class="dropdown-item" id="btn-curves"><i class="ri-line-chart-line"></i> Curvas</button>
+                        <button class="dropdown-item" id="btn-color-balance"><i class="ri-palette-line"></i> Balance de Color</button>
+                        <button class="dropdown-item" id="btn-vibrance"><i class="ri-contrast-drop-line"></i> Vibrance</button>
+                        <button class="dropdown-item" id="btn-selective-color"><i class="ri-drop-line"></i> Color Selectivo</button>
+                        <button class="dropdown-item" id="btn-gradient-map"><i class="ri-palette-line"></i> Gradient Map</button>
+                        <button class="dropdown-item" id="btn-lut"><i class="ri-contrast-drop-2-line"></i> Color LUT</button>
+                    </div>
+                </div>
+                <!-- Selection dropdown -->
+                <div class="toolbar-dropdown" id="dropdown-selection">
+                    <button class="tool-btn" id="btn-selection" title="Seleccion"><i class="ri-checkbox-blank-line"></i><i class="ri-arrow-down-s-line" style="font-size:10px"></i></button>
+                    <div class="toolbar-dropdown-menu hidden" id="selection-menu">
+                        <button class="dropdown-item" id="btn-selection-lasso"><i class="ri-loop-left-line"></i> Lasso</button>
+                        <button class="dropdown-item" id="btn-magic-wand"><i class="ri-magic-line"></i> Varita Magica</button>
+                        <button class="dropdown-item" id="btn-color-range"><i class="ri-palette-line"></i> Rango de Color</button>
+                    </div>
+                </div>
+                <span class="toolbar-separator"></span>
+                <button class="tool-btn" id="btn-ref-image" title="Imagen de referencia"><i class="ri-image-2-line"></i></button>
+                <button class="tool-btn" id="btn-grid" title="Cuadricula"><i class="ri-grid-line"></i></button>
+                <button class="tool-btn" id="btn-grid-snap" title="Snap a cuadricula"><i class="ri-grid-fill"></i></button>
+                <button class="tool-btn" id="btn-optimize-mem" title="Optimizar memoria"><i class="ri-delete-bin-line"></i></button>
+                <button class="tool-btn" id="btn-canvas-presets" title="Tamano canvas"><i class="ri-layout-grid-line"></i></button>
+                <button class="tool-btn" id="btn-perspective-grid" title="Perspective grid"><i class="ri-ruler-line"></i></button>
+                <button class="tool-btn" id="btn-brush-shape-lib" title="Formas de pincel"><i class="ri-shape-line"></i></button>
+                <button class="tool-btn" id="btn-resize" title="Redimensionar"><i class="ri-aspect-ratio-line"></i></button>
+                <button class="tool-btn" id="btn-crop" title="Recortar"><i class="ri-crop-2-line"></i></button>
+                <button class="tool-btn" id="btn-bg-color" title="Color de fondo"><i class="ri-landscape-line"></i></button>
+                <button class="tool-btn" id="btn-reference" title="Imagen de referencia"><i class="ri-image-line"></i></button>
+                <button class="tool-btn" id="btn-paper-texture" title="Textura de papel"><i class="ri-landscape-line"></i></button>
+                <button class="tool-btn" id="btn-painter-mode" title="Modo pintor (respeta bordes)"><i class="ri-brush-2-line"></i></button>
+                <button class="tool-btn" id="btn-clone-stamp" title="Clone stamp"><i class="ri-file-copy-line"></i></button>
+                <button class="tool-btn" id="btn-texture-eraser" title="Borrador de textura"><i class="ri-eraser-line"></i></button>
+                <button class="tool-btn" id="btn-smart-eraser" title="Borrador inteligente (respeta bordes)"><i class="ri-eraser-line"></i></button>
+                <button class="tool-btn" id="btn-auto-palette" title="Auto-paleta de selección"><i class="ri-palette-line"></i></button>
+                <button class="tool-btn" id="btn-shortcuts" title="Atajos de teclado"><i class="ri-keyboard-line"></i></button>
+                <button class="tool-btn" id="btn-animation" title="Animación cuadro a cuadro"><i class="ri-film-line"></i></button>
+                <button class="tool-btn" id="btn-radial-symmetry" title="Simetría radial"><i class="ri-flip-line"></i></button>
+                <button class="tool-btn" id="btn-macros" title="Macros / Acciones"><i class="ri-repeat-line"></i></button>
+                <button class="tool-btn" id="btn-smart-fill" title="Relleno inteligente"><i class="ri-paint-fill"></i></button>
+                <button class="tool-btn" id="btn-animated-brush" title="Pincel animado"><i class="ri-sparkles-line"></i></button>
+                <button class="tool-btn" id="btn-mask-feather" title="Desenfoque de máscara"><i class="ri-blur-off-line"></i></button>
+                <!-- Batch 6: New Features -->
+                <button class="tool-btn" id="btn-brush-taper" title="Taper por velocidad"><i class="ri-subtract-line"></i></button>
+                <button class="tool-btn" id="btn-brush-texture-mask" title="Máscara textura pincel"><i class="ri-image-line"></i></button>
+                <button class="tool-btn" id="btn-eraser-per-stroke" title="Borrador por trazo"><i class="ri-eraser-line"></i></button>
+                <button class="tool-btn" id="btn-invert-selection" title="Invertir selección"><i class="ri-checkbox-multiple-blank-line"></i></button>
+                <button class="tool-btn" id="btn-grow-selection" title="Expandir selección"><i class="ri-expand-up-line"></i></button>
+                <button class="tool-btn" id="btn-shrink-selection" title="Reducir selección"><i class="ri-collapse-down-line"></i></button>
+                <button class="tool-btn" id="btn-quick-select-ai" title="Quick Select AI"><i class="ri-magic-line"></i></button>
+                <button class="tool-btn" id="btn-brush-dynamics" title="Dinámicas de pincel"><i class="ri-dashboard-line"></i></button>
+                <button class="tool-btn" id="btn-color-harmony" title="Armonía de color"><i class="ri-palette-line"></i></button>
+                <button class="tool-btn" id="btn-blend-preview" title="Preview modos de fusión"><i class="ri-eye-line"></i></button>
+                <button class="tool-btn" id="btn-layer-groups" title="Grupos de capas"><i class="ri-folder-line"></i></button>
+                <button class="tool-btn" id="btn-ref-library" title="Biblioteca de referencias"><i class="ri-gallery-line"></i></button>
+                <button class="tool-btn" id="btn-brush-smoothing" title="Suavizado de pincel"><i class="ri-surgical-mask-line"></i></button>
+                <button class="tool-btn" id="btn-brush-uv" title="UV mapping"><i class="ri-ruler-line"></i></button>
+                <button class="tool-btn" id="btn-quick-mask" title="Modo máscara rápida"><i class="ri-paint-brush-line"></i></button>
+                <button class="tool-btn" id="btn-alpha-lock" title="Bloquear transparencia"><i class="ri-lock-line"></i></button>
+                <button class="tool-btn" id="btn-apply-mask-layer" title="Aplicar máscara como capa"><i class="ri-file-copy-line"></i></button>
+                <button class="tool-btn" id="btn-merge-visible" title="Combinar visibles a nueva"><i class="ri-stack-line"></i></button>
+                <button class="tool-btn" id="btn-flatten" title="Aplanar todas las capas"><i class="ri-layout-flat-line"></i></button>
+                <button class="tool-btn" id="btn-edge-detect" title="Detección de bordes"><i class="ri-shape-line"></i></button>
+                <button class="tool-btn" id="btn-posterize" title="Posterizar"><i class="ri-gradient-line"></i></button>
+                <button class="tool-btn" id="btn-pixelate" title="Pixelar"><i class="ri-grid-line"></i></button>
+                <button class="tool-btn" id="btn-emboss" title="Relieve"><i class="ri-stack-line"></i></button>
+                <button class="tool-btn" id="btn-solarize" title="Solarizar"><i class="ri-sun-line"></i></button>
+                <button class="tool-btn" id="btn-color-sampler" title="Muestreador de color"><i class="ri-drop-line"></i></button>
+                <button class="tool-btn" id="btn-color-swap" title="Intercambio global de color"><i class="ri-exchange-line"></i></button>
+                <button class="tool-btn" id="btn-fullscreen" title="Pantalla completa"><i class="ri-fullscreen-line"></i></button>
+                <button class="tool-btn" id="btn-snap-rotate" title="Rotar con snap 45°"><i class="ri-clockwise-line"></i></button>
+                <button class="tool-btn" id="btn-toolbar-customize" title="Personalizar barra"><i class="ri-settings-3-line"></i></button>
+                <button class="tool-btn" id="btn-export-svg" title="Exportar SVG"><i class="ri-file-code-line"></i></button>
+                <button class="tool-btn" id="btn-export-pdf" title="Exportar PDF"><i class="ri-file-pdf-line"></i></button>
+                <button class="tool-btn" id="btn-export-gif-anim" title="Exportar animación GIF"><i class="ri-film-line"></i></button>
+                <button class="tool-btn" id="btn-export-preset" title="Exportar con preset"><i class="ri-download-2-line"></i></button>
+                <button class="tool-btn" id="btn-keyboard-only" title="Modo solo teclado"><i class="ri-keyboard-line"></i></button>
+                <button class="tool-btn" id="btn-high-dpi" title="Alternar alta DPI"><i class="ri-scales-line"></i></button>
+                <button class="tool-btn" id="btn-persp-crop" title="Recorte perspectiva"><i class="ri-perspective-line"></i></button>
+                <button class="tool-btn" id="btn-liquify-pinch" title="Liquify Pinch"><i class="ri-subtract-line"></i></button>
+                <button class="tool-btn" id="btn-liquify-bloat" title="Liquify Bloat"><i class="ri-add-line"></i></button>
+                <button class="tool-btn" id="btn-gradient-mesh" title="Malla degradada"><i class="ri-palette-line"></i></button>
+                <button class="tool-btn" id="btn-shape-library" title="Librería de formas"><i class="ri-shape-line"></i></button>
+                <button class="tool-btn" id="btn-vector-edit" title="Editar forma vectorial"><i class="ri-vertex-line"></i></button>
+                <!-- Batch 7: New Features -->
+                <button class="tool-btn" id="btn-paint-load" title="Recargar pintura"><i class="ri-drop-line"></i></button>
+                <button class="tool-btn" id="btn-bristle" title="Simulación de cerdas"><i class="ri-brush-line"></i></button>
+                <button class="tool-btn" id="btn-eraser-hardness" title="Dureza del borrador"><i class="ri-eraser-line"></i></button>
+                <button class="tool-btn" id="btn-poly-lasso" title="Lasso poligonal"><i class="ri-loop-left-line"></i></button>
+                <button class="tool-btn" id="btn-color-range" title="Selección por rango de color"><i class="ri-palette-line"></i></button>
+                <button class="tool-btn" id="btn-select-channel" title="Seleccionar por canal"><i class="ri-git-branch-line"></i></button>
+                <button class="tool-btn" id="btn-denoise" title="Denoise"><i class="ri-blur-off-line"></i></button>
+                <button class="tool-btn" id="btn-bilateral" title="Filtro bilateral"><i class="ri-focus-3-line"></i></button>
+                <button class="tool-btn" id="btn-kuwahara" title="Filtro Kuwahara"><i class="ri-paint-brush-line"></i></button>
+                <button class="tool-btn" id="btn-tilt-shift" title="Tilt-shift"><i class="ri-camera-lens-line"></i></button>
+                <button class="tool-btn" id="btn-histogram" title="Histograma"><i class="ri-bar-chart-line"></i></button>
+                <button class="tool-btn" id="btn-temperature" title="Temperatura/Tint"><i class="ri-thermometer-line"></i></button>
+                <button class="tool-btn" id="btn-channel-mask" title="Máscara por canal"><i class="ri-git-branch-line"></i></button>
+                <button class="tool-btn" id="btn-gradient-mask" title="Máscara degradada"><i class="ri-gradient-line"></i></button>
+                <button class="tool-btn" id="btn-mask-paint" title="Pintar en máscara"><i class="ri-paint-brush-line"></i></button>
+                <button class="tool-btn" id="btn-layer-rename" title="Renombrar capa"><i class="ri-edit-line"></i></button>
+                <button class="tool-btn" id="btn-auto-arrange" title="Auto-organizar capas"><i class="ri-sort-asc"></i></button>
+                <button class="tool-btn" id="btn-layer-search" title="Buscar capas"><i class="ri-search-line"></i></button>
+                <button class="tool-btn" id="btn-history-panel" title="Panel de historial"><i class="ri-history-line"></i></button>
+                <button class="tool-btn" id="btn-split-view" title="Vista dividida"><i class="ri-layout-column-line"></i></button>
+                <button class="tool-btn" id="btn-pixel-grid" title="Cuadrícula de píxeles"><i class="ri-grid-line"></i></button>
+                <button class="tool-btn" id="btn-mask-overlay" title="Superposición de máscara"><i class="ri-eye-line"></i></button>
+                <button class="tool-btn" id="btn-webp-export" title="Exportar WebP"><i class="ri-image-line"></i></button>
+                <button class="tool-btn" id="btn-filename-template" title="Template nombre archivo"><i class="ri-file-text-line"></i></button>
+                <button class="tool-btn" id="btn-seamless" title="Patrón sin costuras"><i class="ri-grid-line"></i></button>
+                <button class="tool-btn" id="btn-dodge-burn" title="Dodge/Burn"><i class="ri-sun-line"></i></button>
+                <button class="tool-btn" id="btn-sponge" title="Herramienta esponja"><i class="ri-drop-line"></i></button>
+                <button class="tool-btn" id="btn-adv-gradient" title="Degradado avanzado"><i class="ri-spectrum-line"></i></button>
+                <button class="tool-btn" id="btn-duplicate-canvas" title="Duplicar canvas"><i class="ri-file-copy-line"></i></button>
+                <button class="tool-btn" id="btn-flip-h" title="Voltear horizontal"><i class="ri-flip-horizontal-line"></i></button>
+                <button class="tool-btn" id="btn-flip-v" title="Voltear vertical"><i class="ri-flip-vertical-line"></i></button>
+                <button class="tool-btn" id="btn-zoom-fit" title="Zoom a ajustar"><i class="ri-fullscreen-line"></i></button>
+                <button class="tool-btn" id="btn-zoom-100" title="Zoom 100%"><i class="ri-zoom-in-line"></i></button>
+                <button class="tool-btn" id="btn-navigator" title="Navegador"><i class="ri-compass-3-line"></i></button>
+                <!-- Batch 8: New Features -->
+                <button class="tool-btn" id="btn-median-filter" title="Filtro mediana"><i class="ri-filter-2-line"></i></button>
+                <button class="tool-btn" id="btn-morph-dilate" title="Dilatar"><i class="ri-add-circle-line"></i></button>
+                <button class="tool-btn" id="btn-morph-erode" title="Erosionar"><i class="ri-subtract-line"></i></button>
+                <button class="tool-btn" id="btn-channel-mix" title="Mezclador de canales"><i class="ri-git-branch-line"></i></button>
+                <button class="tool-btn" id="btn-dir-emboss" title="Relieve direccional"><i class="ri-shape-line"></i></button>
+                <button class="tool-btn" id="btn-quick-select" title="Selección rápida"><i class="ri-cursor-line"></i></button>
+                <button class="tool-btn" id="btn-magnetic-lasso" title="Lazo magnético"><i class="ri-magnetic-line"></i></button>
+                <button class="tool-btn" id="btn-select-similar" title="Seleccionar similar"><i class="ri-checkbox-multiple-line"></i></button>
+                <button class="tool-btn" id="btn-layer-comp" title="Comps de capas"><i class="ri-bookmark-line"></i></button>
+                <button class="tool-btn" id="btn-apply-effects" title="Aplicar efectos como capa"><i class="ri-file-copy-line"></i></button>
+                <button class="tool-btn" id="btn-keyframe" title="Añadir keyframe"><i class="ri-keyframe-line"></i></button>
+                <button class="tool-btn" id="btn-sprite-sheet" title="Exportar sprite sheet"><i class="ri-grid-line"></i></button>
+                <button class="tool-btn" id="btn-loop-mode" title="Modo reproducción"><i class="ri-repeat-line"></i></button>
+                <button class="tool-btn" id="btn-text-preset" title="Preset de texto"><i class="ri-font-size"></i></button>
+                <button class="tool-btn" id="btn-text-circle" title="Texto en círculo"><i class="ri-circle-line"></i></button>
+                <button class="tool-btn" id="btn-batch-export" title="Exportar todas las capas"><i class="ri-download-2-line"></i></button>
+                <button class="tool-btn" id="btn-named-colors" title="Colores nombrados"><i class="ri-palette-line"></i></button>
+                <button class="tool-btn" id="btn-color-history" title="Historial de colores"><i class="ri-history-line"></i></button>
+                <button class="tool-btn" id="btn-whats-new" title="Novedades"><i class="ri-information-line"></i></button>
+                <button class="tool-btn" id="btn-debug-info" title="Info de depuración"><i class="ri-bug-line"></i></button>
+                <button class="tool-btn" id="btn-solo-mode" title="Modo solo"><i class="ri-eye-line"></i></button>
+                <button class="tool-btn" id="btn-flatten-visible" title="Aplanar visibles"><i class="ri-layout-flat-line"></i></button>
+                <button class="tool-btn" id="btn-content-resize" title="Redimensionar con content-aware"><i class="ri-aspect-ratio-line"></i></button>
+                <button class="tool-btn" id="btn-inpaint" title="Inpainting"><i class="ri-magic-line"></i></button>
+                <!-- Batch 9A: Shape Tools -->
+                <button class="tool-btn" id="btn-shape-rect" title="Rectángulo"><i class="ri-checkbox-blank-line"></i></button>
+                <button class="tool-btn" id="btn-shape-ellipse" title="Elipse"><i class="ri-checkbox-blank-circle-line"></i></button>
+                <button class="tool-btn" id="btn-shape-line" title="Línea recta"><i class="ri-minus-line"></i></button>
+                <button class="tool-btn" id="btn-shape-polygon" title="Polígono"><i class="ri-shape-line"></i></button>
+                <!-- Batch 9B: New Brushes -->
+                <button class="tool-btn" id="btn-brush-spray" title="Spray"><i class="ri-rain-line"></i></button>
+                <button class="tool-btn" id="btn-brush-pastel" title="Pastel"><i class="ri-paint-brush-line"></i></button>
+                <button class="tool-btn" id="btn-brush-inkpen" title="Ink Pen"><i class="ri-quill-pen-line"></i></button>
+                <button class="tool-btn" id="btn-brush-flat" title="Flat Brush"><i class="ri-rect-line"></i></button>
+                <!-- Batch 9C: Selection Enhancements -->
+                <button class="tool-btn" id="btn-feather-selection" title="Feather selección"><i class="ri-blur-line"></i></button>
+                <button class="tool-btn" id="btn-fixed-ratio" title="Ratio fijo marquee"><i class="ri-aspect-ratio-line"></i></button>
+                <!-- Text on Path -->
+                <button class="tool-btn" id="btn-text-on-path" title="Texto en curva"><i class="ri-text-wrap"></i></button>
+                <button class="tool-btn" id="btn-export-shape-svg" title="Exportar forma SVG"><i class="ri-shape-line"></i></button>
+                <!-- Batch 9D: Animation Enhancements -->
+                <button class="tool-btn" id="btn-easing-preset" title="Easing presets"><i class="ri-timer-line"></i></button>
+                <button class="tool-btn" id="btn-anim-template" title="Plantilla animación"><i class="ri-film-line"></i></button>
+                <!-- Batch 9E: Export Enhancements -->
+                <button class="tool-btn" id="btn-export-tiff" title="Exportar TIFF"><i class="ri-file-zip-line"></i></button>
+                <button class="tool-btn" id="btn-batch-filter" title="Filtro batch"><i class="ri-stack-line"></i></button>
+                <button class="tool-btn" id="btn-export-bg-toggle" title="Toggle fondo export"><i class="ri-landscape-line"></i></button>
+                <!-- Batch 9F: Color Enhancements -->
+                <button class="tool-btn" id="btn-color-groups" title="Grupos de color"><i class="ri-palette-line"></i></button>
+                <button class="tool-btn" id="btn-gamut-mapping" title="Gamut mapping"><i class="ri-drop-line"></i></button>
+                <!-- Batch 9G: UI Enhancements -->
+                <button class="tool-btn" id="btn-workspace-preset" title="Presets de espacio"><i class="ri-layout-masonry-line"></i></button>
+                <button class="tool-btn" id="btn-theme-toggle" title="Cambiar tema"><i class="ri-sun-moon-line"></i></button>
+                <button class="tool-btn" id="btn-panel-reset" title="Reset paneles"><i class="ri-layout-2-line"></i></button>
+                <!-- Batch 9H: Advanced Tools -->
+                <button class="tool-btn" id="btn-perspective-warp" title="Perspective Warp"><i class="ri-perspective-line"></i></button>
+                <button class="tool-btn" id="btn-liquify-preset" title="Liquify presets"><i class="ri-magic-line"></i></button>
+                <!-- Batch 9I: Misc -->
+                <button class="tool-btn" id="btn-rotation-gesture" title="Gesto rotación"><i class="ri-clockwise-line"></i></button>
+                <button class="tool-btn" id="btn-brush-preview-size" title="Preview tamaño pincel"><i class="ri-eye-line"></i></button>
+                <span id="rotation-indicator" class="rotation-indicator" title="Doble toque para resetear rotación">0°</span>
+                <button class="tool-btn" id="btn-rotation-reset" title="Resetear rotación (0°)" style="display:none;width:22px;height:22px;font-size:10px;padding:0;color:var(--accent-color);"><i class="ri-refresh-line"></i></button>
+            </div>
+            <div class="top-bar-right" role="toolbar" aria-label="Herramientas principales">
+                <button class="tool-btn active" id="btn-brush" aria-label="Pincel" aria-pressed="true"><i class="ri-brush-line"></i></button>
+                <button class="tool-btn" id="btn-smudge" aria-label="Difuminar" aria-pressed="false"><i class="ri-fingerprint-line"></i></button>
+                <button class="tool-btn" id="btn-eraser" aria-label="Borrador" aria-pressed="false"><i class="ri-eraser-fill"></i></button>
+                <button class="tool-btn" id="btn-layers" aria-label="Capas" aria-pressed="false"><i class="ri-stack-line"></i></button>
+                <button class="tool-btn color-btn-wrapper" id="btn-color" aria-label="Selector de color">
+                    <div class="color-indicator" id="current-color-indicator"></div>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="workspace" id="workspace" role="main" aria-label="Área de trabajo">
+            <!-- Left Sidebar for Sliders -->
+            <aside class="sidebar-left" role="toolbar" aria-label="Controles de dibujo">
+                <div class="slider-container">
+                    <input type="range" id="size-slider" min="1" max="100" value="10" orient="vertical" class="vertical-slider" aria-label="Tamaño de pincel">
+                </div>
+                
+                <div class="slider-container">
+                    <input type="range" id="stabilization-slider" min="0" max="100" value="5" orient="vertical" class="vertical-slider stabilization-slider" title="Estabilización" aria-label="Estabilización">
+                </div>
+                
+                <div class="undo-redo-container" role="toolbar" aria-label="Deshacer/rehacer">
+                    <button class="tool-btn small" id="btn-undo" aria-label="Deshacer"><i class="ri-arrow-go-back-line"></i></button>
+                    <button class="tool-btn small" id="btn-redo" aria-label="Rehacer"><i class="ri-arrow-go-forward-line"></i></button>
+                </div>
+
+                <div class="slider-container">
+                    <input type="range" id="opacity-slider" min="1" max="100" value="100" orient="vertical" class="vertical-slider" aria-label="Opacidad de capa">
+                </div>
+            </aside>
+
+            <!-- Drawing Area -->
+            <div class="canvas-wrapper" id="canvas-wrapper" role="img" aria-label="Área de dibujo - Canvas principal">
+                <div class="canvas-container" id="canvas-container">
+                    <!-- Canvases will be injected here dynamically -->
+                </div>
+                <canvas id="selection-overlay" class="selection-overlay hidden"></canvas>
+                <canvas id="transform-overlay" class="transform-overlay hidden"></canvas>
+                <canvas id="crop-overlay" class="crop-overlay hidden"></canvas>
+
+                <!-- Crop Panel -->
+                <div id="crop-panel" class="panel hidden transform-panel">
+                    <div class="transform-actions">
+                        <button class="tool-btn" id="btn-crop-cancel" title="Cancelar"><i class="ri-close-line"></i></button>
+                        <button class="tool-btn" id="btn-crop-reset" title="Resetear"><i class="ri-refresh-line"></i></button>
+                        <button class="tool-btn" id="btn-crop-confirm" title="Recortar"><i class="ri-check-line"></i></button>
+                    </div>
+                </div>
+
+                <!-- Reference Image Overlay -->
+                <div id="reference-overlay" class="reference-overlay hidden">
+                    <img id="reference-img" class="reference-img" draggable="false">
+                    <div class="reference-controls">
+                        <button class="ref-btn" id="ref-opacity-down" title="Bajar opacidad"><i class="ri-subtract-line"></i></button>
+                        <span id="ref-opacity-val">50%</span>
+                        <button class="ref-btn" id="ref-opacity-up" title="Subir opacidad"><i class="ri-add-line"></i></button>
+                        <button class="ref-btn" id="ref-close" title="Cerrar"><i class="ri-close-line"></i></button>
+                    </div>
+                    <div class="reference-resize-handle" id="reference-resize-handle"></div>
+                </div>
+
+                <input type="file" id="reference-file-input" accept="image/*" style="display:none">
+
+                <!-- Animation Timeline -->
+                <div id="animation-timeline" class="animation-timeline hidden">
+                    <div class="timeline-controls">
+                        <button class="tool-btn small" id="btn-anim-first" title="Primer cuadro"><i class="ri-skip-back-mini-line"></i></button>
+                        <button class="tool-btn small" id="btn-anim-prev" title="Cuadro anterior"><i class="ri-arrow-left-s-line"></i></button>
+                        <button class="tool-btn small" id="btn-anim-play" title="Reproducir"><i class="ri-play-fill"></i></button>
+                        <button class="tool-btn small" id="btn-anim-next" title="Cuadro siguiente"><i class="ri-arrow-right-s-line"></i></button>
+                        <button class="tool-btn small" id="btn-anim-last" title="Último cuadro"><i class="ri-skip-forward-mini-line"></i></button>
+                        <span id="anim-frame-label" style="font-size:10px;margin:0 6px;">1/1</span>
+                        <button class="tool-btn small" id="btn-anim-add-frame" title="Añadir cuadro"><i class="ri-add-line"></i></button>
+                        <button class="tool-btn small" id="btn-anim-dup-frame" title="Duplicar cuadro"><i class="ri-file-copy-line"></i></button>
+                        <button class="tool-btn small" id="btn-anim-del-frame" title="Eliminar cuadro"><i class="ri-delete-bin-line"></i></button>
+                        <div style="border-left:1px solid var(--border-color);margin:0 4px;height:18px;"></div>
+                        <label style="font-size:9px;">FPS</label>
+                        <input type="range" id="anim-fps" min="1" max="30" value="12" style="width:60px;accent-color:var(--accent-color);height:12px;">
+                        <span id="anim-fps-val" style="font-size:9px;">12</span>
+                        <div style="border-left:1px solid var(--border-color);margin:0 4px;height:18px;"></div>
+                        <button class="tool-btn small" id="btn-anim-onion" title="Onion skin"><i class="ri-ghost-line"></i></button>
+                        <label style="font-size:9px;">Onion</label>
+                        <input type="range" id="anim-onion-opacity" min="5" max="80" value="30" style="width:50px;accent-color:var(--accent-color);height:12px;">
+                    </div>
+                    <div id="timeline-frames" class="timeline-frames">
+                        <!-- Frame thumbnails injected here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Gallery View -->
+        <div id="gallery-view" class="gallery-view hidden">
+            <div class="gallery-header">
+                <h2>Galería</h2>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <button class="tool-btn small" id="btn-new-folder" title="Nueva carpeta"><i class="ri-folder-add-line"></i></button>
+                    <button class="tool-btn text-btn" id="btn-new-project"><i class="ri-add-line"></i> Nuevo</button>
+                </div>
+            </div>
+            <div class="gallery-breadcrumb" id="gallery-breadcrumb">
+                <span class="breadcrumb-item" data-folder="">Inicio</span>
+            </div>
+            <div class="gallery-grid" id="gallery-grid">
+                <!-- Projects will be listed here -->
+            </div>
+        </div>
+        
+        <!-- Brushes Panel -->
+        <div id="brushes-panel" class="panel hidden" style="top: 60px; right: 160px; width: 200px;">
+            <div class="panel-header">Pinceles</div>
+            <div class="panel-content">
+                <div class="layers-list">
+                    <div class="layer-item active" data-brush="solid">Pluma Dura</div>
+                    <div class="layer-item" data-brush="pencil">Lápiz</div>
+                    <div class="layer-item" data-brush="airbrush">Aerógrafo</div>
+                    <div class="layer-item" data-brush="marker">Rotulador</div>
+                    <div class="layer-item" data-brush="calligraphy">Caligrafía</div>
+                    <div class="layer-item" data-brush="splatter">Salpicadura</div>
+                    <div class="layer-item" data-brush="texture">Textura</div>
+                    <div class="layer-item" data-brush="charcoal">Carbón</div>
+                    <div class="layer-item" data-brush="watercolor">Acuarela</div>
+                    <div class="layer-item" data-brush="oilpaint">Óleo</div>
+                    <div class="layer-item" data-brush="spray">Spray</div>
+                    <div class="layer-item" data-brush="pastel">Pastel</div>
+                    <div class="layer-item" data-brush="inkpen">Ink Pen</div>
+                    <div class="layer-item" data-brush="flat">Flat Brush</div>
+                </div>
+                <div class="brush-studio" id="brush-studio">
+                    <div class="slider-row">
+                        <label>Espaciado</label>
+                        <input type="range" id="brush-spacing" min="1" max="30" value="4">
+                        <span id="brush-spacing-val">4</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>Dispersión</label>
+                        <input type="range" id="brush-scatter" min="0" max="100" value="0">
+                        <span id="brush-scatter-val">0</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>Jitter</label>
+                        <input type="range" id="brush-jitter" min="0" max="100" value="0">
+                        <span id="brush-jitter-val">0</span>
+                    </div>
+                <div class="slider-row">
+                    <label>Estabilización</label>
+                    <input type="range" id="brush-stabilization" min="0" max="100" value="5">
+                </div>
+<div class="slider-row">
+                     <label>Predicción</label>
+                     <input type="range" id="stroke-prediction" min="0" max="20" value="0">
+                     <span id="stroke-prediction-val">0</span>
+                 </div>
+                 <div class="slider-row">
+                     <label>Tensión (Catmull)</label>
+                     <input type="range" id="catmull-tension" min="0" max="100" value="50">
+                     <span id="catmull-tension-val">0.5</span>
+                 </div>
+                    <div class="slider-row">
+                        <label>Rotación</label>
+                        <input type="range" id="brush-rotation" min="0" max="360" value="0">
+                        <span id="brush-rotation-val">0</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>Dir. rot.</label>
+                        <input type="range" id="brush-dir-rotation" min="0" max="100" value="0">
+                        <span id="brush-dir-rotation-val">0</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>Color T.</label>
+                        <input type="range" id="brush-color-dynamics" min="0" max="100" value="0">
+                        <span id="brush-color-dynamics-val">0</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>Mezcla húm.</label>
+                        <input type="range" id="brush-wet-mix" min="0" max="100" value="0">
+                        <span id="brush-wet-mix-val">0</span>
+                    </div>
+                    <div class="slider-row dual-brush-row">
+                        <label>Dual</label>
+                        <input type="checkbox" id="brush-dual-toggle">
+                        <select id="brush-dual-type">
+                            <option value="solid">Pluma Dura</option>
+                            <option value="pencil">Lápiz</option>
+                            <option value="airbrush">Aerógrafo</option>
+                            <option value="marker">Rotulador</option>
+                            <option value="calligraphy">Caligrafía</option>
+                            <option value="splatter">Salpicadura</option>
+                            <option value="texture">Textura</option>
+                            <option value="charcoal">Carbón</option>
+                            <option value="watercolor">Acuarela</option>
+                            <option value="oilpaint">Óleo</option>
+                            <option value="spray">Spray</option>
+                            <option value="pastel">Pastel</option>
+                            <option value="inkpen">Ink Pen</option>
+                            <option value="flat">Flat Brush</option>
+                        </select>
+                    </div>
+                    <div class="slider-row dual-brush-row">
+                        <label>Punta</label>
+                        <select id="brush-tip-shape" style="flex:1;background:var(--toolbar-bg);color:var(--text-color);border:1px solid var(--border-color);border-radius:4px;font-size:11px;padding:2px 4px;">
+                            <option value="circle">Círculo</option>
+                            <option value="square">Cuadrado</option>
+                            <option value="triangle">Triángulo</option>
+                            <option value="line">Línea</option>
+                        </select>
+                    </div>
+                    <div class="slider-row">
+                        <label>Textura</label>
+                        <button class="tool-btn small" id="btn-import-brush-texture" title="Importar textura de pincel"><i class="ri-image-add-line"></i></button>
+                        <span id="brush-texture-name" style="font-size:9px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Ninguna</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>Intensidad tex.</label>
+                        <input type="range" id="brush-texture-intensity" min="0" max="100" value="0">
+                        <span id="brush-texture-intensity-val">0</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>Escala tex.</label>
+                        <input type="range" id="brush-texture-scale" min="10" max="300" value="100">
+                        <span id="brush-texture-scale-val">100%</span>
+                    </div>
+                    <div style="border-top:1px solid var(--border-color);margin:4px 0;"></div>
+                    <div class="slider-row">
+                        <label>Curva presión</label>
+                        <canvas id="pressure-curve-canvas" width="150" height="80" style="width:100%;border:1px solid var(--border-color);border-radius:4px;cursor:crosshair;"></canvas>
+                    </div>
+                    <div class="slider-row">
+                        <button class="tool-btn small" id="btn-pressure-curve-reset">Reset curva</button>
+                    </div>
+                    <input type="file" id="brush-texture-file" accept="image/*" style="display:none;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Color Panel with HSB Picker -->
+        <div id="color-panel" class="panel hidden">
+            <div class="panel-header">Color</div>
+            <div class="panel-content">
+                <div class="hsb-picker">
+                    <canvas id="hue-wheel" width="220" height="220"></canvas>
+                    <canvas id="sb-square" width="110" height="110"></canvas>
+                </div>
+                <div class="color-preview-row">
+                    <div class="color-preview-swatch" id="color-preview-swatch"></div>
+                    <input type="text" id="hex-input" class="hex-input" value="#000000" maxlength="7">
+                </div>
+                <div class="color-presets">
+                    <div class="color-preset" style="background:#000000" data-color="#000000"></div>
+                    <div class="color-preset" style="background:#ffffff" data-color="#ffffff"></div>
+                    <div class="color-preset" style="background:#ff3b30" data-color="#ff3b30"></div>
+                    <div class="color-preset" style="background:#ff9500" data-color="#ff9500"></div>
+                    <div class="color-preset" style="background:#ffcc00" data-color="#ffcc00"></div>
+                    <div class="color-preset" style="background:#34c759" data-color="#34c759"></div>
+                    <div class="color-preset" style="background:#00c7be" data-color="#00c7be"></div>
+                    <div class="color-preset" style="background:#007aff" data-color="#007aff"></div>
+                    <div class="color-preset" style="background:#5856d6" data-color="#5856d6"></div>
+                    <div class="color-preset" style="background:#af52de" data-color="#af52de"></div>
+                    <div class="color-preset" style="background:#ff2d55" data-color="#ff2d55"></div>
+                    <div class="color-preset" style="background:#a2845e" data-color="#a2845e"></div>
+                    <div class="color-preset" style="background:#8e8e93" data-color="#8e8e93"></div>
+                    <div class="color-preset" style="background:#f5e6ca" data-color="#f5e6ca"></div>
+                    <div class="color-preset" style="background:#2c2c2e" data-color="#2c2c2e"></div>
+                </div>
+
+                <div class="palettes-section">
+                    <div class="palettes-header">
+                        <span>Recientes</span>
+                        <button class="tool-btn small" id="btn-clear-recent-colors" title="Limpiar historial"><i class="ri-delete-bin-line"></i></button>
+                    </div>
+                    <div id="recent-colors" class="color-presets" style="min-height:24px;"></div>
+                </div>
+
+                <div class="palettes-section">
+                    <div class="palettes-header">
+                        <span>Paletas</span>
+                        <button class="tool-btn small" id="btn-save-palette" title="Guardar paleta actual"><i class="ri-add-line"></i></button>
+                    </div>
+                    <div id="palettes-list" class="palettes-list">
+                        <!-- Palettes injected by JS -->
+                    </div>
+                </div>
+
+                <div class="palettes-section">
+                    <div class="palettes-header">
+                        <span>Armonía</span>
+                        <select id="harmony-type" style="background:var(--toolbar-bg);color:var(--text-color);border:1px solid var(--border-color);border-radius:4px;font-size:10px;padding:1px 4px;">
+                            <option value="complementary">Complementario</option>
+                            <option value="triadic">Triádico</option>
+                            <option value="analogous">Análogo</option>
+                            <option value="split">Split-Complementario</option>
+                            <option value="tetradic">Tetrádico</option>
+                        </select>
+                    </div>
+                    <div id="harmony-swatches" class="color-presets" style="gap:4px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Eyedropper Loupe -->
+        <div id="eyedropper-loupe" class="eyedropper-loupe hidden">
+            <canvas id="eyedropper-canvas" width="80" height="80"></canvas>
+            <div class="eyedropper-color-preview" id="eyedropper-preview"></div>
+        </div>
+
+        <!-- ColorDrop Indicator -->
+        <div id="colordrop-indicator" class="colordrop-indicator hidden">
+            <div class="colordrop-circle"></div>
+        </div>
+
+        <!-- Guides Panel -->
+        <div id="guides-panel" class="panel hidden" style="top: 60px; left: 80px; width: 200px;">
+            <div class="panel-header">Guías</div>
+            <div class="panel-content">
+                <div class="layers-list">
+                    <div class="layer-item" data-guide="none"><i class="ri-close-line"></i> Ninguna</div>
+                    <div class="layer-item" data-guide="line"><i class="ri-ruler-line"></i> Línea recta</div>
+                    <div class="layer-item" data-guide="sym-v"><i class="ri-flip-horizontal-line"></i> Simetría vertical</div>
+                    <div class="layer-item" data-guide="sym-h"><i class="ri-flip-vertical-line"></i> Simetría horizontal</div>
+                    <div class="layer-item" data-guide="sym-4"><i class="ri-quadrangle-line"></i> Simetría 4</div>
+                    <div class="layer-item" data-guide="perspective-1"><i class="ri-perspective"></i> Perspectiva 1 punto</div>
+                    <div class="layer-item" data-guide="perspective-2"><i class="ri-perspective"></i> Perspectiva 2 puntos</div>
+                    <div class="layer-item" data-guide="isometric"><i class="ri-grid-line"></i> Isométrica</div>
+                </div>
+                <div style="border-top:1px solid var(--border-color);margin:6px 0;"></div>
+                <div class="hsb-row" style="padding:0 4px;">
+                    <label style="font-size:9px;">Opacidad guías</label>
+                    <input type="range" id="guide-opacity" min="10" max="100" value="50" style="flex:1;accent-color:var(--accent-color);height:12px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Fill Tolerance Slider -->
+        <div id="fill-settings" class="sidebar-settings hidden">
+            <label>Tolerancia: <span id="fill-tolerance-value">32</span></label>
+            <input type="range" id="fill-tolerance" min="1" max="100" value="32">
+        </div>
+
+        <!-- Liquify Settings -->
+        <div id="liquify-settings" class="sidebar-settings hidden liquify-settings">
+            <div class="liquify-modes">
+                <button class="tool-btn small active" data-liquify="push" title="Empujar"><i class="ri-arrow-right-up-line"></i></button>
+                <button class="tool-btn small" data-liquify="pull" title="Arrastrar"><i class="ri-arrow-left-down-line"></i></button>
+                <button class="tool-btn small" data-liquify="twirl" title="Girar"><i class="ri-refresh-line"></i></button>
+                <button class="tool-btn small" data-liquify="smooth" title="Suavizar"><i class="ri-blur-off-line"></i></button>
+            </div>
+            <label>Fuerza: <span id="liquify-strength-value">50</span></label>
+            <input type="range" id="liquify-strength" min="1" max="100" value="50">
+        </div>
+
+        <!-- Transform Panel -->
+        <div id="transform-panel" class="panel hidden transform-panel">
+            <div class="transform-actions">
+                <button class="tool-btn" id="btn-transform-cancel" title="Cancelar"><i class="ri-close-line"></i></button>
+                <button class="tool-btn" id="btn-transform-flip-h" title="Voltear horizontal"><i class="ri-flip-horizontal-line"></i></button>
+                <button class="tool-btn" id="btn-transform-flip-v" title="Voltear vertical"><i class="ri-flip-vertical-line"></i></button>
+                <button class="tool-btn" id="btn-selection-invert" title="Invertir selección"><i class="ri-contrast-line"></i></button>
+                <button class="tool-btn" id="btn-transform-confirm" title="Confirmar"><i class="ri-check-line"></i></button>
+            </div>
+            <div class="transform-actions" style="padding:4px 8px;">
+                <label style="font-size:10px;color:var(--icon-color);white-space:nowrap;">Feather</label>
+                <input type="range" id="selection-feather" min="0" max="50" value="0" style="flex:1;accent-color:var(--accent-color);">
+                <span id="selection-feather-val" style="font-size:10px;color:var(--icon-color);min-width:20px;text-align:right;">0</span>
+            </div>
+        </div>
+
+        <!-- Text Panel -->
+        <div id="text-panel" class="panel hidden text-panel">
+            <div class="text-panel-row">
+                <input type="text" id="text-input" class="text-input" placeholder="Escribe aquí..." value="">
+            </div>
+            <div class="text-panel-row">
+                <select id="text-font-select" class="text-font-select">
+                    <option value="Arial">Arial</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Palatino">Palatino</option>
+                    <option value="Garamond">Garamond</option>
+                    <option value="Bookman">Bookman</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Lucida Console">Lucida Console</option>
+                    <option value="Monaco">Monaco</option>
+                    <option value="Consolas">Consolas</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Calibri">Calibri</option>
+                    <option value="Cambria">Cambria</option>
+                    <option value="Segoe UI">Segoe UI</option>
+                    <option value="Impact">Impact</option>
+                    <option value="Trebuchet MS">Trebuchet MS</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Comic Sans MS">Comic Sans MS</option>
+                </select>
+                <input type="range" id="text-size-slider" min="12" max="200" value="48" class="text-size-slider">
+                <span id="text-size-label" class="text-size-label">48px</span>
+            </div>
+            <div class="text-panel-row text-format-row">
+                <button class="tool-btn small" id="btn-text-bold" title="Negrita"><b>B</b></button>
+                <button class="tool-btn small" id="btn-text-italic" title="Cursiva"><i>I</i></button>
+                <button class="tool-btn small" id="btn-text-underline" title="Subrayado"><u>U</u></button>
+                <span class="text-separator"></span>
+                <button class="tool-btn small" id="btn-text-align-left" title="Izquierda"><i class="ri-align-left"></i></button>
+                <button class="tool-btn small" id="btn-text-align-center" title="Centro"><i class="ri-align-center"></i></button>
+                <button class="tool-btn small" id="btn-text-align-right" title="Derecha"><i class="ri-align-right"></i></button>
+            </div>
+            <div class="text-panel-row" style="gap:6px;align-items:center;">
+                <label style="font-size:9px;white-space:nowrap;">Espaciado</label>
+                <input type="range" id="text-letter-spacing" min="0" max="20" value="0" style="flex:1;accent-color:var(--accent-color);height:12px;">
+                <span id="text-letter-spacing-label" style="font-size:9px;min-width:20px;">0</span>
+            </div>
+            <div class="text-panel-row" style="gap:6px;align-items:center;">
+                <label style="font-size:9px;white-space:nowrap;">Interlineado</label>
+                <input type="range" id="text-line-height" min="8" max="30" value="12" style="flex:1;accent-color:var(--accent-color);height:12px;">
+                <span id="text-line-height-label" style="font-size:9px;min-width:20px;">1.2</span>
+            </div>
+            <div class="text-panel-row text-actions-row">
+                <button class="tool-btn" id="btn-text-cancel"><i class="ri-close-line"></i></button>
+                <button class="tool-btn" id="btn-text-confirm"><i class="ri-check-line"></i></button>
+                <button class="tool-btn" id="btn-text-to-vector" title="Convertir texto a vector SVG"><i class="ri-vector-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Guides Overlay Canvas -->
+        <canvas id="guides-overlay" class="guides-overlay hidden"></canvas>
+
+        <!-- HSB Adjustment Panel -->
+        <div id="hsb-panel" class="sidebar-settings hidden hsb-panel">
+            <div class="hsb-row">
+                <label>Tono</label>
+                <input type="range" id="hsb-hue" min="-180" max="180" value="0">
+                <span id="hsb-hue-val">0</span>
+            </div>
+            <div class="hsb-row">
+                <label>Saturación</label>
+                <input type="range" id="hsb-sat" min="-100" max="100" value="0">
+                <span id="hsb-sat-val">0</span>
+            </div>
+            <div class="hsb-row">
+                <label>Brillo</label>
+                <input type="range" id="hsb-bri" min="-100" max="100" value="0">
+                <span id="hsb-bri-val">0</span>
+            </div>
+            <div class="hsb-actions">
+                <button class="tool-btn small" id="btn-hsb-cancel"><i class="ri-close-line"></i></button>
+                <button class="tool-btn small" id="btn-hsb-reset"><i class="ri-refresh-line"></i></button>
+                <button class="tool-btn small" id="btn-hsb-apply" style="background:var(--accent-color)"><i class="ri-check-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Levels Panel -->
+        <div id="levels-panel" class="sidebar-settings hidden" style="min-width:200px">
+            <div class="hsb-row">
+                <label>Negro</label>
+                <input type="range" id="levels-black" min="0" max="255" value="0">
+                <span id="levels-black-val">0</span>
+            </div>
+            <div class="hsb-row">
+                <label>Medio</label>
+                <input type="range" id="levels-mid" min="10" max="250" value="128">
+                <span id="levels-mid-val">128</span>
+            </div>
+            <div class="hsb-row">
+                <label>Blanco</label>
+                <input type="range" id="levels-white" min="0" max="255" value="255">
+                <span id="levels-white-val">255</span>
+            </div>
+            <div class="hsb-actions">
+                <button class="tool-btn small" id="btn-levels-cancel"><i class="ri-close-line"></i></button>
+                <button class="tool-btn small" id="btn-levels-reset"><i class="ri-refresh-line"></i></button>
+                <button class="tool-btn small" id="btn-levels-apply" style="background:var(--accent-color)"><i class="ri-check-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Curves Panel -->
+        <div id="curves-panel" class="sidebar-settings hidden" style="min-width:220px">
+            <canvas id="curves-canvas" width="180" height="180" style="border-radius:6px;cursor:crosshair;"></canvas>
+            <div class="curves-channel-row">
+                <button class="tool-btn small active" id="curves-ch-rgb">RGB</button>
+                <button class="tool-btn small" id="curves-ch-r" style="color:#ff4444">R</button>
+                <button class="tool-btn small" id="curves-ch-g" style="color:#44ff44">G</button>
+                <button class="tool-btn small" id="curves-ch-b" style="color:#4488ff">B</button>
+            </div>
+            <div class="hsb-actions">
+                <button class="tool-btn small" id="btn-curves-cancel"><i class="ri-close-line"></i></button>
+                <button class="tool-btn small" id="btn-curves-reset"><i class="ri-refresh-line"></i></button>
+                <button class="tool-btn small" id="btn-curves-apply" style="background:var(--accent-color)"><i class="ri-check-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Blur Panel -->
+        <div id="blur-panel" class="sidebar-settings hidden">
+            <div class="hsb-row">
+                <label>Radio</label>
+                <input type="range" id="blur-radius" min="1" max="20" value="3">
+                <span id="blur-radius-val">3</span>
+            </div>
+            <div class="hsb-actions">
+                <button class="tool-btn small" id="btn-blur-cancel"><i class="ri-close-line"></i></button>
+                <button class="tool-btn small" id="btn-blur-apply" style="background:var(--accent-color)"><i class="ri-check-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Motion Blur Panel -->
+        <div id="motion-blur-panel" class="sidebar-settings hidden" style="min-width:180px">
+            <div class="hsb-row">
+                <label>Radio</label>
+                <input type="range" id="motion-blur-radius" min="1" max="30" value="5">
+                <span id="motion-blur-radius-val">5</span>
+            </div>
+            <div class="hsb-row">
+                <label>Ángulo</label>
+                <input type="range" id="motion-blur-angle" min="0" max="360" value="0">
+                <span id="motion-blur-angle-val">0°</span>
+            </div>
+            <div style="display:flex;justify-content:center;padding:4px 0;">
+                <canvas id="motion-blur-angle-preview" width="60" height="60" style="border-radius:50%;border:1px solid var(--text-muted);background:rgba(0,0,0,0.2);"></canvas>
+            </div>
+            <div class="hsb-actions">
+                <button class="tool-btn small" id="btn-motion-blur-cancel"><i class="ri-close-line"></i></button>
+                <button class="tool-btn small" id="btn-motion-blur-apply" style="background:var(--accent-color)"><i class="ri-check-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Color Balance Panel -->
+        <div id="color-balance-panel" class="sidebar-settings hidden" style="min-width:220px">
+            <div class="hsb-row">
+                <label>Rojos</label>
+                <input type="range" id="cb-reds" min="-100" max="100" value="0">
+                <span id="cb-reds-val">0</span>
+            </div>
+            <div class="hsb-row">
+                <label>Verdes</label>
+                <input type="range" id="cb-greens" min="-100" max="100" value="0">
+                <span id="cb-greens-val">0</span>
+            </div>
+            <div class="hsb-row">
+                <label>Azules</label>
+                <input type="range" id="cb-blues" min="-100" max="100" value="0">
+                <span id="cb-blues-val">0</span>
+            </div>
+            <div class="hsb-row">
+                <label>Rango</label>
+                <select id="cb-range" style="flex:1;background:var(--toolbar-bg);color:var(--text-color);border:1px solid var(--border-color);border-radius:4px;font-size:11px;padding:2px 4px;">
+                    <option value="midtones">Mediotono</option>
+                    <option value="shadows">Sombras</option>
+                    <option value="highlights">Altas luces</option>
+                </select>
+            </div>
+            <div class="hsb-actions">
+                <button class="tool-btn small" id="btn-cb-cancel"><i class="ri-close-line"></i></button>
+                <button class="tool-btn small" id="btn-cb-reset"><i class="ri-refresh-line"></i></button>
+                <button class="tool-btn small" id="btn-cb-apply" style="background:var(--accent-color)"><i class="ri-check-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Vibrance Panel -->
+        <div id="vibrance-panel" class="sidebar-settings hidden" style="min-width:200px">
+            <div class="hsb-row">
+                <label>Vibrance</label>
+                <input type="range" id="vibrance-val-slider" min="-100" max="100" value="0">
+                <span id="vibrance-val-display">0</span>
+            </div>
+            <div class="hsb-row">
+                <label>Saturación</label>
+                <input type="range" id="vibrance-saturation" min="-100" max="100" value="0">
+                <span id="vibrance-saturation-val">0</span>
+            </div>
+            <div class="hsb-actions">
+                <button class="tool-btn small" id="btn-vibrance-cancel"><i class="ri-close-line"></i></button>
+                <button class="tool-btn small" id="btn-vibrance-reset"><i class="ri-refresh-line"></i></button>
+                <button class="tool-btn small" id="btn-vibrance-apply" style="background:var(--accent-color)"><i class="ri-check-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Selective Color Panel -->
+        <div id="selective-color-panel" class="sidebar-settings hidden" style="min-width:220px">
+            <div class="hsb-row">
+                <label>Color</label>
+                <select id="sc-color" style="flex:1;background:var(--toolbar-bg);color:var(--text-color);border:1px solid var(--border-color);border-radius:4px;font-size:11px;padding:2px 4px;">
+                    <option value="reds">Rojos</option>
+                    <option value="yellows">Amarillos</option>
+                    <option value="greens">Verdes</option>
+                    <option value="cyans">Cian</option>
+                    <option value="blues">Azules</option>
+                    <option value="magentas">Magenta</option>
+                    <option value="whites">Blancos</option>
+                    <option value="neutrals">Neutros</option>
+                    <option value="blacks">Negros</option>
+                </select>
+            </div>
+            <div class="hsb-row"><label>Cian</label><input type="range" id="sc-cyan" min="-100" max="100" value="0"><span id="sc-cyan-val">0</span></div>
+            <div class="hsb-row"><label>Magenta</label><input type="range" id="sc-magenta" min="-100" max="100" value="0"><span id="sc-magenta-val">0</span></div>
+            <div class="hsb-row"><label>Amarillo</label><input type="range" id="sc-yellow" min="-100" max="100" value="0"><span id="sc-yellow-val">0</span></div>
+            <div class="hsb-row"><label>Negro</label><input type="range" id="sc-black" min="-100" max="100" value="0"><span id="sc-black-val">0</span></div>
+            <div class="hsb-actions">
+                <button class="tool-btn small" id="btn-sc-cancel"><i class="ri-close-line"></i></button>
+                <button class="tool-btn small" id="btn-sc-reset"><i class="ri-refresh-line"></i></button>
+                <button class="tool-btn small" id="btn-sc-apply" style="background:var(--accent-color)"><i class="ri-check-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Resize Panel -->
+        <div id="resize-panel" class="sidebar-settings hidden" style="min-width:200px">
+            <div class="hsb-row">
+                <label>Ancho</label>
+                <input type="number" id="resize-width" min="100" max="4096" step="1" style="width:60px">
+                <span>px</span>
+            </div>
+            <div class="hsb-row">
+                <label>Alto</label>
+                <input type="number" id="resize-height" min="100" max="4096" step="1" style="width:60px">
+                <span>px</span>
+            </div>
+            <div class="hsb-actions">
+                <button class="tool-btn small" id="btn-resize-cancel"><i class="ri-close-line"></i></button>
+                <button class="tool-btn small" id="btn-resize-apply" style="background:var(--accent-color)"><i class="ri-check-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Paper Texture Panel -->
+        <div id="paper-texture-panel" class="sidebar-settings hidden" style="min-width:180px">
+            <div class="hsb-row">
+                <label>Tipo</label>
+                <select id="paper-texture-type" style="flex:1;background:var(--toolbar-bg);color:var(--text-color);border:1px solid var(--border-color);border-radius:4px;font-size:11px;padding:2px 4px;">
+                    <option value="smooth">Suave</option>
+                    <option value="rough">Áspero</option>
+                    <option value="cold">Frío</option>
+                    <option value="hot">Caliente</option>
+                </select>
+            </div>
+            <div class="hsb-row">
+                <label>Intensidad</label>
+                <input type="range" id="paper-texture-intensity" min="0" max="100" value="30">
+                <span id="paper-texture-intensity-val">30</span>
+            </div>
+            <div class="hsb-actions">
+                <button class="tool-btn small" id="btn-paper-texture-toggle" title="Activar/desactivar"><i class="ri-eye-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Gradient Panel -->
+        <div id="gradient-panel" class="sidebar-settings hidden" style="min-width:180px">
+            <div class="hsb-row">
+                <label>Tipo</label>
+                <select id="gradient-type" style="flex:1;background:var(--toolbar-bg);color:var(--text-color);border:1px solid var(--border-color);border-radius:4px;font-size:11px;padding:2px 4px;">
+                    <option value="linear">Lineal</option>
+                    <option value="radial">Radial</option>
+                </select>
+            </div>
+            <div class="hsb-row">
+                <label>Opacidad</label>
+                <input type="range" id="gradient-opacity" min="1" max="100" value="100">
+                <span id="gradient-opacity-val">100</span>
+            </div>
+            <div class="hsb-actions">
+                <button class="tool-btn small" id="btn-gradient-cancel"><i class="ri-close-line"></i></button>
+                <button class="tool-btn small" id="btn-gradient-apply" style="background:var(--accent-color)"><i class="ri-check-line"></i></button>
+            </div>
+        </div>
+
+        <!-- Canvas Presets Panel -->
+        <div id="canvas-presets-panel" class="sidebar-settings hidden" style="min-width:200px">
+            <div class="panel-content" style="max-height:200px;overflow-y:auto;">
+                <div class="layers-list" id="canvas-presets-list"></div>
+            </div>
+        </div>
+
+        <!-- Background Color Panel -->
+        <div id="bg-color-panel" class="sidebar-settings hidden" style="min-width:180px">
+            <div class="hsb-row">
+                <label>Fondo</label>
+                <div class="bg-color-swatches" id="bg-color-swatches">
+                    <div class="color-preset bg-swatch" style="background:#ffffff" data-bg="#ffffff" title="Blanco"></div>
+                    <div class="color-preset bg-swatch" style="background:#f5f5f5" data-bg="#f5f5f5" title="Gris claro"></div>
+                    <div class="color-preset bg-swatch" style="background:#808080" data-bg="#808080" title="Gris medio"></div>
+                    <div class="color-preset bg-swatch" style="background:#2c2c2c" data-bg="#2c2c2c" title="Gris oscuro"></div>
+                    <div class="color-preset bg-swatch" style="background:#1c1c1e" data-bg="#1c1c1e" title="Negro"></div>
+                    <div class="color-preset bg-swatch" style="background:transparent" data-bg="transparent" title="Transparente"></div>
+                </div>
+            </div>
+            <div class="hsb-row">
+                <label>Exportar</label>
+                <select id="bg-export-mode" style="flex:1;background:var(--toolbar-bg);color:var(--text-color);border:1px solid var(--border-color);border-radius:4px;font-size:11px;padding:2px 4px;">
+                    <option value="color">Color de fondo</option>
+                    <option value="white">Siempre blanco</option>
+                    <option value="transparent">Transparente (PNG)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- JPEG Quality Panel -->
+        <div id="jpeg-quality-panel" class="sidebar-settings hidden" style="min-width:180px">
+            <div class="hsb-row">
+                <label>Calidad JPEG</label>
+                <span id="jpeg-quality-val" style="font-size:10px;min-width:24px;text-align:right;">90</span>
+            </div>
+            <input type="range" id="jpeg-quality" min="10" max="100" value="90" step="5" style="width:100%;accent-color:var(--accent-color);height:20px;">
+            <div class="hsb-row" style="justify-content:center;">
+                <button class="tool-btn" id="btn-export-jpeg-go" style="margin-top:4px;"><i class="ri-download-line"></i> Exportar</button>
+            </div>
+        </div>
+
+        <!-- Export Presets Panel -->
+        <div id="export-presets-panel" class="sidebar-settings hidden" style="min-width:180px">
+            <div style="padding:4px 8px;font-size:11px;font-weight:600;border-bottom:1px solid var(--border-color);">Exportar con Preset</div>
+            <div style="padding:6px 8px;display:flex;flex-direction:column;gap:3px;">
+                <button class="tool-btn small export-preset-btn" data-preset="instagram">Instagram 1080x1080</button>
+                <button class="tool-btn small export-preset-btn" data-preset="instagram_story">Instagram Story 1080x1920</button>
+                <button class="tool-btn small export-preset-btn" data-preset="twitter">Twitter 1200x675</button>
+                <button class="tool-btn small export-preset-btn" data-preset="youtube">YouTube 1280x720</button>
+                <button class="tool-btn small export-preset-btn" data-preset="wallpaper_4k">Wallpaper 4K</button>
+                <button class="tool-btn small export-preset-btn" data-preset="wallpaper_1080">Wallpaper 1080p</button>
+            </div>
+            <div style="border-top:1px solid var(--border-color);margin:4px 0;"></div>
+            <div style="padding:4px 8px;display:flex;gap:4px;">
+                <button class="tool-btn small" id="btn-export-hdr"><i class="ri-contrast-drop-line"></i> HDR</button>
+                <button class="tool-btn small" id="btn-export-gif"><i class="ri-film-line"></i> GIF</button>
+            </div>
+        </div>
+
+        <!-- Magic Wand Tolerance Panel -->
+        <div id="magic-wand-panel" class="sidebar-settings hidden" style="min-width:160px">
+            <div class="hsb-row">
+                <label>Tolerancia</label>
+                <span id="magic-wand-tol-val" style="font-size:10px;min-width:24px;text-align:right;">32</span>
+            </div>
+            <input type="range" id="magic-wand-tolerance" min="1" max="100" value="32" style="width:100%;accent-color:var(--accent-color);height:20px;">
+        </div>
+
+        <!-- Layer Effects Panel -->
+        <div id="layer-effects-panel" class="sidebar-settings hidden" style="min-width:200px">
+            <div class="panel-header" style="padding:4px 8px;font-size:11px;">Efectos de Capa</div>
+            <div style="padding:4px 8px;">
+                <div class="hsb-row" style="margin-bottom:4px;">
+                    <label style="font-size:10px;">Sombra</label>
+                    <input type="checkbox" id="fx-shadow-enable" style="accent-color:var(--accent-color);">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">X</label>
+                    <input type="range" id="fx-shadow-x" min="-50" max="50" value="4" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Y</label>
+                    <input type="range" id="fx-shadow-y" min="-50" max="50" value="4" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Blur</label>
+                    <input type="range" id="fx-shadow-blur" min="0" max="50" value="8" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Opacidad</label>
+                    <input type="range" id="fx-shadow-opacity" min="0" max="100" value="50" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:6px;">
+                    <label style="font-size:9px;">Color</label>
+                    <input type="color" id="fx-shadow-color" value="#000000" style="width:28px;height:20px;border:none;padding:0;cursor:pointer;">
+                </div>
+
+                <div class="hsb-row" style="margin-bottom:4px;">
+                    <label style="font-size:10px;">Resplandor</label>
+                    <input type="checkbox" id="fx-glow-enable" style="accent-color:var(--accent-color);">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Radio</label>
+                    <input type="range" id="fx-glow-blur" min="0" max="50" value="10" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Opacidad</label>
+                    <input type="range" id="fx-glow-opacity" min="0" max="100" value="50" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Color</label>
+                    <input type="color" id="fx-glow-color" value="#ffffff" style="width:28px;height:20px;border:none;padding:0;cursor:pointer;">
+                </div>
+                <div class="hsb-row">
+                    <label style="font-size:9px;">Extensión</label>
+                    <input type="range" id="fx-glow-spread" min="0" max="20" value="0" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+
+                <div style="border-top:1px solid var(--border-color);margin:6px 0;"></div>
+
+                <div class="hsb-row" style="margin-bottom:4px;">
+                    <label style="font-size:10px;">Desenfoque</label>
+                    <input type="checkbox" id="fx-blur-enable" style="accent-color:var(--accent-color);">
+                </div>
+                <div class="hsb-row">
+                    <label style="font-size:9px;">Radio</label>
+                    <input type="range" id="fx-blur-radius" min="0" max="20" value="0" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+
+                <div style="border-top:1px solid var(--border-color);margin:6px 0;"></div>
+
+                <div class="hsb-row" style="margin-bottom:4px;">
+                    <label style="font-size:10px;">Sombra Interior</label>
+                    <input type="checkbox" id="fx-inner-shadow-enable" style="accent-color:var(--accent-color);">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">X</label>
+                    <input type="range" id="fx-inner-shadow-x" min="-50" max="50" value="-4" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Y</label>
+                    <input type="range" id="fx-inner-shadow-y" min="-50" max="50" value="-4" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Blur</label>
+                    <input type="range" id="fx-inner-shadow-blur" min="0" max="50" value="8" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Opacidad</label>
+                    <input type="range" id="fx-inner-shadow-opacity" min="0" max="100" value="50" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:6px;">
+                    <label style="font-size:9px;">Color</label>
+                    <input type="color" id="fx-inner-shadow-color" value="#000000" style="width:28px;height:20px;border:none;padding:0;cursor:pointer;">
+                </div>
+
+                <div class="hsb-row" style="margin-bottom:4px;">
+                    <label style="font-size:10px;">Resplandor Interior</label>
+                    <input type="checkbox" id="fx-inner-glow-enable" style="accent-color:var(--accent-color);">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Radio</label>
+                    <input type="range" id="fx-inner-glow-blur" min="0" max="50" value="10" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Opacidad</label>
+                    <input type="range" id="fx-inner-glow-opacity" min="0" max="100" value="50" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:6px;">
+                    <label style="font-size:9px;">Color</label>
+                    <input type="color" id="fx-inner-glow-color" value="#ffffff" style="width:28px;height:20px;border:none;padding:0;cursor:pointer;">
+                </div>
+
+                <div class="hsb-row" style="margin-bottom:4px;">
+                    <label style="font-size:10px;">Bisel</label>
+                    <input type="checkbox" id="fx-bevel-enable" style="accent-color:var(--accent-color);">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Tamaño</label>
+                    <input type="range" id="fx-bevel-size" min="0" max="50" value="5" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:2px;">
+                    <label style="font-size:9px;">Suavidad</label>
+                    <input type="range" id="fx-bevel-softness" min="0" max="100" value="50" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row">
+                    <label style="font-size:9px;">Opacidad</label>
+                    <input type="range" id="fx-bevel-opacity" min="0" max="100" value="50" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Adjustment Layer Panel -->
+        <div id="adjustment-panel" class="sidebar-settings hidden" style="min-width:220px;max-height:50vh;overflow-y:auto;">
+            <div style="padding:4px 8px;font-size:11px;font-weight:600;border-bottom:1px solid var(--border-color);">Capa de Ajuste</div>
+            <div id="adjustment-type-selector" style="padding:6px 8px;display:flex;gap:4px;flex-wrap:wrap;">
+                <button class="tool-btn small adj-type-btn active" data-type="hsb">HSB</button>
+                <button class="tool-btn small adj-type-btn" data-type="curves">Curvas</button>
+                <button class="tool-btn small adj-type-btn" data-type="levels">Niveles</button>
+            </div>
+            <div id="adjustment-controls" style="padding:4px 8px;">
+                <!-- HSB Controls -->
+                <div id="adj-hsb-controls">
+                    <div class="hsb-row" style="margin-bottom:2px;">
+                        <label style="font-size:9px;">Tono</label>
+                        <input type="range" id="adj-hue" min="-180" max="180" value="0" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                        <span id="adj-hue-val" style="font-size:9px;width:28px;text-align:right;">0°</span>
+                    </div>
+                    <div class="hsb-row" style="margin-bottom:2px;">
+                        <label style="font-size:9px;">Saturación</label>
+                        <input type="range" id="adj-sat" min="-100" max="100" value="0" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                        <span id="adj-sat-val" style="font-size:9px;width:28px;text-align:right;">0%</span>
+                    </div>
+                    <div class="hsb-row">
+                        <label style="font-size:9px;">Brillo</label>
+                        <input type="range" id="adj-bri" min="-100" max="100" value="0" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                        <span id="adj-bri-val" style="font-size:9px;width:28px;text-align:right;">0%</span>
+                    </div>
+                </div>
+                <!-- Curves Controls -->
+                <div id="adj-curves-controls" style="display:none;">
+                    <canvas id="adj-curves-canvas" width="180" height="120" style="width:100%;border:1px solid var(--border-color);border-radius:4px;cursor:crosshair;"></canvas>
+                    <div class="hsb-row" style="margin-top:4px;">
+                        <button class="tool-btn small" id="adj-curves-reset">Reset</button>
+                    </div>
+                </div>
+                <!-- Levels Controls -->
+                <div id="adj-levels-controls" style="display:none;">
+                    <div class="hsb-row" style="margin-bottom:2px;">
+                        <label style="font-size:9px;">Entrada min</label>
+                        <input type="range" id="adj-levels-in-min" min="0" max="255" value="0" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                        <span id="adj-levels-in-min-val" style="font-size:9px;width:28px;text-align:right;">0</span>
+                    </div>
+                    <div class="hsb-row" style="margin-bottom:2px;">
+                        <label style="font-size:9px;">Gamma</label>
+                        <input type="range" id="adj-levels-gamma" min="10" max="300" value="100" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                        <span id="adj-levels-gamma-val" style="font-size:9px;width:28px;text-align:right;">1.0</span>
+                    </div>
+                    <div class="hsb-row">
+                        <label style="font-size:9px;">Entrada max</label>
+                        <input type="range" id="adj-levels-in-max" min="0" max="255" value="255" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                        <span id="adj-levels-in-max-val" style="font-size:9px;width:28px;text-align:right;">255</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Radial Symmetry Panel -->
+        <div id="symmetry-panel" class="sidebar-settings hidden" style="min-width:180px;">
+            <div style="padding:4px 8px;font-size:11px;font-weight:600;border-bottom:1px solid var(--border-color);">Simetría Radial</div>
+            <div style="padding:6px 8px;">
+                <div class="hsb-row" style="margin-bottom:4px;">
+                    <label style="font-size:9px;">Ejes</label>
+                    <button class="tool-btn small sym-axes-btn active" data-axes="4">4</button>
+                    <button class="tool-btn small sym-axes-btn" data-axes="6">6</button>
+                    <button class="tool-btn small sym-axes-btn" data-axes="8">8</button>
+                </div>
+                <div class="hsb-row" style="margin-bottom:4px;">
+                    <label style="font-size:9px;">Centro X</label>
+                    <input type="range" id="sym-center-x" min="0" max="100" value="50" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row" style="margin-bottom:4px;">
+                    <label style="font-size:9px;">Centro Y</label>
+                    <input type="range" id="sym-center-y" min="0" max="100" value="50" style="flex:1;accent-color:var(--accent-color);height:14px;">
+                </div>
+                <div class="hsb-row">
+                    <label style="font-size:9px;">Mostrar guías</label>
+                    <input type="checkbox" id="sym-show-guides" checked style="accent-color:var(--accent-color);">
+                </div>
+            </div>
+        </div>
+
+        <!-- Macros Panel -->
+        <div id="macros-panel" class="sidebar-settings hidden" style="min-width:200px;max-height:50vh;overflow-y:auto;">
+            <div style="padding:4px 8px;font-size:11px;font-weight:600;border-bottom:1px solid var(--border-color);">Macros / Acciones</div>
+            <div style="padding:6px 8px;display:flex;gap:4px;">
+                <button class="tool-btn small" id="btn-macro-record" title="Grabar"><i class="ri-record-circle-line"></i></button>
+                <button class="tool-btn small" id="btn-macro-stop" title="Detener" disabled><i class="ri-stop-circle-line"></i></button>
+                <button class="tool-btn small" id="btn-macro-play" title="Reproducir" disabled><i class="ri-play-fill"></i></button>
+                <button class="tool-btn small" id="btn-macro-save" title="Guardar macro" disabled><i class="ri-save-line"></i></button>
+            </div>
+            <div id="macro-record-status" style="padding:2px 8px;font-size:9px;color:#aaa;">Listo para grabar</div>
+            <div id="macros-list" style="padding:4px 8px;">
+                <!-- Saved macros listed here -->
+            </div>
+        </div>
+
+        <!-- Keyboard Shortcuts Panel -->
+        <div id="shortcuts-panel" class="sidebar-settings hidden" style="min-width:250px;max-height:60vh;overflow-y:auto;">
+            <div style="padding:4px 8px;font-size:11px;font-weight:600;border-bottom:1px solid var(--border-color);">Atajos de Teclado</div>
+            <div id="shortcuts-list" style="padding:4px 8px;"></div>
+            <div style="padding:4px 8px;font-size:8px;color:var(--text-secondary);border-top:1px solid var(--border-color);">
+                Haz clic en un campo y presiona una tecla para reasignar. Ej: Ctrl+Z, B, Shift+S
+            </div>
+        </div>
+
+        <!-- Layers Panel -->
+        <div id="layers-panel" class="panel hidden" role="region" aria-label="Panel de capas">
+            <div class="panel-header">
+                Capas
+                <div class="layer-actions" role="toolbar" aria-label="Acciones de capa">
+                    <button class="tool-btn small" id="btn-duplicate-layer" title="Duplicar capa" aria-label="Duplicar capa"><i class="ri-file-copy-line"></i></button>
+                    <button class="tool-btn small" id="btn-clear-layer" title="Limpiar capa" aria-label="Limpiar capa"><i class="ri-eraser-line"></i></button>
+                    <button class="tool-btn small" id="btn-merge-down" title="Fusionar abajo" aria-label="Fusionar abajo"><i class="ri-merge-cells-vertical"></i></button>
+                    <button class="tool-btn small" id="btn-delete-layer" title="Eliminar capa" aria-label="Eliminar capa"><i class="ri-delete-bin-line"></i></button>
+                    <button class="tool-btn small" id="btn-add-layer" title="Añadir capa" aria-label="Añadir capa"><i class="ri-add-line"></i></button>
+                    <button class="tool-btn small" id="btn-add-adjustment" title="Añadir capa de ajuste" aria-label="Añadir capa de ajuste"><i class="ri-equalizer-line"></i></button>
+                    <button class="tool-btn small" id="btn-add-group" title="Añadir grupo" aria-label="Añadir grupo"><i class="ri-folder-line"></i></button>
+                    <button class="tool-btn small" id="btn-add-mask" title="Añadir máscara de capa" aria-label="Añadir máscara"><i class="ri-mask-line"></i></button>
+                    <button class="tool-btn small" id="btn-add-fill" title="Añadir capa de relleno" aria-label="Añadir capa de relleno"><i class="ri-paint-brush-line"></i></button>
+                    <button class="tool-btn small" id="btn-layer-effects" title="Efectos de capa" aria-label="Efectos de capa"><i class="ri-sparkling-line"></i></button>
+                </div>
+            </div>
+            <div style="padding:4px 8px;">
+                <input type="text" id="layer-search-input" placeholder="Buscar capa..." aria-label="Buscar capas" style="width:100%;background:var(--canvas-bg);color:var(--text-color);border:1px solid var(--border-color);border-radius:6px;padding:4px 8px;font-size:11px;outline:none;">
+            </div>
+            <div class="panel-content">
+                <div class="canvas-flip-row">
+                    <button class="tool-btn small" id="btn-flip-h-panel" title="Flip horizontal" aria-label="Voltear horizontal"><i class="ri-flip-horizontal-line"></i></button>
+                    <button class="tool-btn small" id="btn-flip-v-panel" title="Flip vertical" aria-label="Voltear vertical"><i class="ri-flip-vertical-line"></i></button>
+                </div>
+                <div id="layers-list" class="layers-list" role="listbox" aria-label="Lista de capas">
+                    <!-- Layer items will be injected here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal System -->
+    <div id="modal-root" role="dialog" aria-modal="true" aria-live="polite"></div>
+
+    <!-- Reference Image Overlay -->
+    <div id="ref-image-overlay" class="hidden">
+        <img id="ref-image-el" src="" alt="Referencia">
+    </div>
+
+    <!-- Grid Overlay -->
+    <canvas id="grid-overlay-canvas" class="grid-overlay hidden"></canvas>
+
+    <script src="main.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>

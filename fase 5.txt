@@ -1,0 +1,213 @@
+# Fase 5 — Herramientas Avanzadas
+
+## Resumen
+Implementar herramientas profesionales faltantes: Selección+Transform, Estabilización de trazos, Modos de fusión avanzados con vista compuesta, Texto, y Liquify/Warp.
+
+---
+
+## 1. Selección + Transform
+
+Herramienta de selección rectangular con transformación (mover, escalar, rotar).
+
+#### [MODIFY] [index.html]
+- Añadir panel flotante de transformación con botones: confirmar (check), cancelar (x), y botones de flip H/V.
+- Añadir overlay de selección con handles (esquinas + rotación).
+
+#### [MODIFY] [style.css]
+- Estilos para overlay de selección: borde punteado animado (marching ants).
+- Estilos para handles: círculos blancos con borde negro en esquinas, handle de rotación arriba.
+- Panel de transformación flotante con botones circulares.
+
+#### [MODIFY] [main.js]
+- **Selección:**
+  - Modo `selection`: pointerdown define esquina inicial, pointermove dibuja rectángulo, pointerup completa selección.
+  - `selectionRect = { x, y, w, h }` en coordenadas canvas lógicas.
+  - Dibujar marching ants animado en overlay canvas (setInterval o requestAnimationFrame).
+  - Al completar selección → copiar pixels seleccionados a `selectionImageData` (canvas offscreen temporal).
+  - Limpiar la zona seleccionada de la capa activa con `clearRect`.
+- **Transform:**
+  - Al tener selección activa, dibujar handles en overlay:
+    - 4 esquinas para escalar (drag = escalar proporcional)
+    - 1 handle de rotación arriba centro (drag = rotar)
+    - Drag dentro del rectángulo = mover
+  - Aplicar transformación en tiempo real: `ctx.save(); ctx.translate(); ctx.rotate(); ctx.scale(); ctx.drawImage(selectionCanvas, ...); ctx.restore();`
+  - **Confirmar** → dibujar imagen transformada en la capa activa, limpiar selección.
+  - **Cancelar** → restaurar capa desde snapshot, limpiar selección.
+  - **Flip H/V** → invertir horizontal/vertical la imagen seleccionada.
+- **Estado:**
+  - `selectionActive: boolean`
+  - `selectionRect: { x, y, w, h }`
+  - `selectionCanvas: HTMLCanvasElement` (offscreen con pixels copiados)
+  - `selectionTransform: { x, y, rotation, scaleX, scaleY }`
+  - `isDraggingSelection: boolean`
+  - `selectionDragMode: 'move' | 'scale' | 'rotate'`
+
+---
+
+## 2. Estabilización de Trazos (Streamline)
+
+Suavizado en tiempo real para trazos tembloros. Esencial para stylus genérico.
+
+#### [MODIFY] [index.html]
+- Añadir slider de estabilización en la barra lateral izquierda (debajo del slider de tamaño).
+- Valor de 0 (sin estabilización) a 100 (máxima estabilización).
+
+#### [MODIFY] [style.css]
+- Slider vertical con icono de onda/corazón.
+
+#### [MODIFY] [main.js]
+- **Algoritmo: Moving Average con Catmull-Rom Spline**
+  - `stabilizationLevel: 0-100` (default 0)
+  - Cuando stabilizationLevel > 0:
+    - Mantener buffer de últimos N puntos (N = 3 + Math.floor(stabilizationLevel / 10))
+    - En cada pointermove, añadir punto al buffer
+    - Calcular punto suavizado como promedio ponderado de los últimos N puntos
+    - Dibujar hasta el punto suavizado (no el punto crudo)
+    - El último punto del buffer se usa como "punto de anclaje" para el siguiente segmento
+  - Para curvas: usar Catmull-Rom spline entre puntos suavizados para curvas naturales
+  - **Latencia intencional**: el trazo se dibuja ~2-3 puntos detrás del cursor real, creando la sensación de "tinta fluyendo"
+- **Optimización:**
+  - Solo activo durante drawing, no en idle
+  - Buffer limitado a 10 puntos máximo
+  - Cálculo simple: promedio ponderado con peso exponencial decreciente
+
+---
+
+## 3. Modos de Fusión Avanzados + Composite View
+
+Añadir ~10 blend modes más y renderizar composite en tiempo real (no solo en export).
+
+#### [MODIFY] [main.js]
+- **Nuevos blend modes** (añadir al selector existente):
+  - Aclarar Color (Color Dodge) → `color-dodge`
+  - Oscurecer Color (Color Burn) → `color-burn`
+  - Luz Fuerte (Hard Light) → `hard-light`
+  - Luz Suave (Soft Light) → `soft-light`
+  - Diferencia (Difference) → `difference`
+  - Exclusión (Exclusion) → `exclusion`
+  - Tono (Hue) → `hue`
+  - Saturación (Saturation) → `saturation`
+  - Color (Color) → `color`
+  - Luminosidad (Luminosity) → `luminosity`
+- **Composite View (render en tiempo real):**
+  - Actualmente las capas se apilan con CSS (cada canvas es un DOM element con opacity).
+  - Para blend modes correctos, implementar `renderComposite()`:
+    - Canvas composite oculto (`compositeCanvas`) del tamaño del canvas lógico × DPR
+    - En cada frame de dibujo (pointermove), renderizar todas las capas en `compositeCanvas` en orden, aplicando `globalCompositeOperation` de cada capa
+    - Copiar `compositeCanvas` al canvas visible principal
+  - **Rendimiento**: Solo re-renderizar cuando hay cambios (flag `needsCompositeRender`)
+  - Optimización: cachear composición de capas que no cambiaron
+  - Usar `requestAnimationFrame` para render suave
+
+#### [MODIFY] [index.html]
+- Actualizar `<select>` de blend modes con las ~16 opciones.
+
+---
+
+## 4. Herramienta de Texto
+
+Añadir texto al canvas con fuentes del sistema.
+
+#### [MODIFY] [index.html]
+- Añadir botón de texto en la barra superior (`ri-font-size`).
+- Panel de texto flotante con:
+  - Campo de input para el texto
+  - Selector de fuente (system fonts: Arial, Georgia, Courier New, Verdana, Impact, Comic Sans MS, Trebuchet MS, Times New Roman)
+  - Slider de tamaño (12-200px)
+  - Botones de formato: Negrita, Cursiva, Subrayado
+  - Selector de alineación: Izquierda, Centro, Derecha
+  - Color heredado del brush actual
+  - Botones Confirmar / Cancelar
+
+#### [MODIFY] [style.css]
+- Panel de texto flotante centrado con blur backdrop.
+- Preview del texto en tiempo real sobre el canvas.
+
+#### [MODIFY] [main.js]
+- **Modo texto:**
+  - Al activar modo texto → pausar modo brush
+  - Mostrar panel de texto con preview en vivo
+  - Texto preview dibujado en un canvas overlay semitransparente
+  - Posición del texto: centro del canvas (o donde se hizo click)
+  - Mover texto: drag sobre el canvas mientras el panel está abierto
+- **Confirmar:**
+  - `ctx.font = 'bold italic 48px Arial'`
+  - `ctx.fillText(text, x, y)` o `ctx.strokeText(text, x, y)`
+  - Rasterizar texto en la capa activa
+  - Cerrar panel, volver al modo anterior
+  - Guardar estado para undo
+- **Estado:**
+  - `textMode: boolean`
+  - `textContent: string`
+  - `textFont: string`
+  - `textSize: number`
+  - `textBold: boolean`
+  - `textItalic: boolean`
+  - `textUnderline: boolean`
+  - `textAlign: 'left' | 'center' | 'right'`
+  - `textPosition: { x, y }`
+
+---
+
+## 5. Liquify / Warp
+
+Herramienta para distorsionar partes de la imagen.
+
+#### [MODIFY] [index.html]
+- Añadir botón de liquify en la barra superior (`ri-magic-line`).
+- Panel de configuración de liquify con:
+  - Tamaño del pincel (reutilizar slider de tamaño)
+  - Selector de modo: Empujar (Push), Arrastrar (Pull), Girar (Twirl), Suavizar (Smooth)
+  - Slider de fuerza (1-100)
+
+#### [MODIFY] [style.css]
+- Panel de configuración de liquify.
+
+#### [MODIFY] [main.js]
+- **Liquify Push:**
+  - En pointermove:采样 un área circular alrededor del cursor
+  - Desplazar los píxeles en la dirección del movimiento del cursor
+  - Algoritmo: para cada pixel dentro del radio del pincel:
+    - Calcular distancia al centro del cursor
+    - Factor de influencia = 1 - (distancia / radio)² (suave)
+    - Desplazar pixel en la dirección del vector de movimiento × factor × fuerza
+  - Usar `getImageData` / `putImageData` para manipular pixels
+- **Liquify Pull (逆方向):**
+  - Misma lógica pero los píxeles se mueven HACIA el cursor en vez de en la dirección del movimiento
+- **Liquify Twirl:**
+  - En lugar de desplazar en línea recta, rotar los píxeles alrededor del centro del cursor
+  - Ángulo de rotación = fuerza × (1 - distancia/radio)
+- **Liquify Smooth:**
+  - Promediar cada pixel con sus vecinos (blur local)
+  - Reduce distorsiones existentes
+- **Implementación técnica:**
+  - Trabajar sobre una copia del canvas activo (snapshot temporal)
+  - En cada pointermove: restaurar snapshot → aplicar liquify completo desde los puntos acumulados
+  - Al pointerup: commit el resultado final a la capa activa
+  - **Rendimiento**: Para iPad 5th gen, limitar radio máximo a 100px y usar paso de muestreo (cada 2do pixel)
+- **Estado:**
+  - `liquifyMode: 'push' | 'pull' | 'twirl' | 'smooth'`
+  - `liquifyStrength: 1-100`
+  - `isLiquifying: boolean`
+  - `liquifyPoints: [{ x, y, dx, dy }]` (historial de movimiento)
+  - `liquifySnapshot: HTMLCanvasElement` (copia temporal del layer)
+
+---
+
+## Verification Plan
+
+### Manual Testing (iPad 5th gen)
+1. **Selección**: Dibujar algo → seleccionar zona → mover contenido → verificar que se mueve correctamente.
+2. **Selección + Escalar**: Seleccionar → arrastrar esquina → verificar escalamiento proporcional.
+3. **Selección + Rotar**: Seleccionar → arrastrar handle de rotación → verificar rotación.
+4. **Flip**: Seleccionar → flip horizontal → verificar espejado.
+5. **Estabilización**: Subir slider a 50 → dibujar curva → verificar suavizado sin temblor.
+6. **Estabilización 0**: Bajar a 0 → verificar respuesta inmediata sin delay.
+7. **Blend modes**: Crear 2 capas → cambiar blend mode → verificar efecto visual en tiempo real.
+8. **Composite view**: Cambiar opacidad de capa con blend mode multiply → verificar que se ve correctamente.
+9. **Texto**: Activar texto → escribir → cambiar fuente/tamaño → confirmar → verificar texto rasterizado.
+10. **Liquify Push**: Dibujar forma → activar liquify → arrastrar sobre la imagen → verificar deformación.
+11. **Liquify Twirl**: Cambiar a twirl → mantener pulsado → verificar rotación local.
+12. **Liquify Smooth**: Distorsionar → cambiar a smooth → pasar sobre zona → verificar que se suaviza.
+13. **Undo post-liquify**: Hacer liquify → undo → verificar restauración completa.
+14. **Auto-save**: Hacer selección + transform → refrescar → verificar que se conserva.

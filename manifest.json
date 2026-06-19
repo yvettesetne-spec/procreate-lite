@@ -1,0 +1,33 @@
+{
+    "name": "Procreate Lite Premium",
+    "short_name": "Procreate Lite",
+    "description": "Una versión premium ligera de Procreate para iPad con todas las características profesionales",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "orientation": "landscape",
+    "background_color": "#000000",
+    "theme_color": "#2c2c2e",
+    "scope": "/",
+    "screenshots": [
+        {
+            "src": "icons/screenshot1.png",
+            "sizes": "1242x2208",
+            "type": "image/png"
+        }
+    ],
+    "icons": [
+        {
+            "src": "icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "categories": ["productivity", "design", "art"],
+    "iarc_rating_id": "e8e1b736-7b56-4d81-80b3-7084db56bfba",
+    "lang": "es"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "procreate-lite",
+  "version": "1.0.0",
+  "description": "A lightweight drawing app for iPad",
+  "main": "index.js",
+  "scripts": {
+    "start": "serve . -s -l 3000",
+    "dev": "live-server . --port=3000",
+    "build": "echo \"Building production bundle...\"",
+    "lint": "echo \"No lint configuration found\"",
+    "test": "echo \"No test configuration found\""
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}

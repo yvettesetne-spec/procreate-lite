@@ -1,0 +1,56 @@
+# Fase 3 - Funcionalidades Profesionales
+
+## Resumen
+Añadir las herramientas que faltan para que la app sea usable como herramienta de dibujo real.
+
+## Proposed Changes
+
+### 1. Selector de Color Avanzado (Rueda HSB)
+Reemplazar el `<input type="color">` nativo por una rueda de color HSB dibujada en canvas, con un cuadrado de saturación/brillo interior. Estilo Procreate.
+
+#### [MODIFY] [index.html](file:///c:/Users/Yvett/Desktop/Proyectos%20Antigravity/procreate-lite/index.html)
+- Reemplazar contenido del `#color-panel` con canvas para rueda y cuadrado HSB.
+
+#### [MODIFY] [style.css](file:///c:/Users/Yvett/Desktop/Proyectos%20Antigravity/procreate-lite/style.css)
+- Estilos para el nuevo selector de color.
+
+#### [MODIFY] [main.js](file:///c:/Users/Yvett/Desktop/Proyectos%20Antigravity/procreate-lite/main.js)
+- Dibujar rueda de hue + cuadrado de saturación/brillo.
+- Manejar interacción táctil para seleccionar color.
+
+---
+
+### 2. Gestión Avanzada de Capas
+- Eliminar capa (con confirmación si tiene contenido).
+- Limpiar capa activa.
+- Fusionar capa hacia abajo (Merge Down).
+
+#### [MODIFY] [index.html](file:///c:/Users/Yvett/Desktop/Proyectos%20Antigravity/procreate-lite/index.html)
+- Añadir botones de eliminar/limpiar/fusionar al panel de capas.
+
+#### [MODIFY] [main.js](file:///c:/Users/Yvett/Desktop/Proyectos%20Antigravity/procreate-lite/main.js)
+- Funciones `deleteLayer()`, `clearLayer()`, `mergeDown()`.
+
+---
+
+### 3. Exportar Imagen
+- Botón para exportar el lienzo completo (todas las capas fusionadas) como PNG.
+- Usar un canvas temporal offscreen para combinar capas y descargar.
+
+#### [MODIFY] [index.html](file:///c:/Users/Yvett/Desktop/Proyectos%20Antigravity/procreate-lite/index.html)
+- Añadir botón de exportar en la barra superior izquierda.
+
+#### [MODIFY] [main.js](file:///c:/Users/Yvett/Desktop/Proyectos%20Antigravity/procreate-lite/main.js)
+- Función `exportImage()` que fusiona capas visibles y descarga PNG.
+
+---
+
+### 4. Más Presets de Color
+- Ampliar la paleta de presets a 15+ colores curados para arte digital.
+
+## Verification Plan
+
+### Manual Verification
+- Probar selector de color en iPad con touch.
+- Probar eliminar/fusionar capas.
+- Probar exportar y verificar que se descarga un PNG correcto.

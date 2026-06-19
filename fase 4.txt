@@ -1,0 +1,224 @@
+# Fase 4 — Procreate Clone completo para iPad
+
+## Resumen
+Convertir Procreate Lite en un clon funcional de Procreate para iPad 5th gen con stylus genérico. Sin soporte de presión de Apple Pencil.
+
+---
+
+## 1. Cuentagotas (Eyedropper)
+
+Long-press en el canvas → lupa circular que muestra la zona ampliada + color bajo el cursor → soltar para seleccionar color.
+
+#### [MODIFY] [index.html]
+- Añadir `<div id="eyedropper-loupe">` oculto con canvas interno.
+
+#### [MODIFY] [style.css]
+- Estilos para la lupa: posición fija, tamaño 80x80px, borde blanco, sombra, canvas interno 60x60 con zoom x4.
+
+#### [MODIFY] [main.js]
+- Detectar long-press (500ms) en pointerdown → activar modo eyedropper.
+- En pointermove: leer pixel del canvas activa en esa posición, actualizar color y dibujar vista previa en la lupa.
+- En pointerup: aplicar color seleccionado, volver al modo anterior.
+- Estado: `eyedropperActive`, `longPressTimer`.
+
+---
+
+## 2. Opacidad por Capa
+
+Slider de opacidad por cada capa individual, visible en el panel de capas.
+
+#### [MODIFY] [index.html]
+- Añadir control de opacidad en cada `.layer-item` del panel de capas.
+
+#### [MODIFY] [main.js]
+- Añadir `opacity` al objeto layer (0-1, default 1).
+- En `renderLayersUI()`: renderizar slider de opacidad por capa.
+- Aplicar opacidad al canvas: `canvas.style.opacity = layer.opacity`.
+- Guardar opacidad en el estado del proyecto (IndexedDB).
+
+---
+
+## 3. Relleno (Flood Fill)
+
+Herramienta cubo de pintura que rellena áreas contiguas del mismo color.
+
+#### [MODIFY] [index.html]
+- Añadir botón de relleno en la barra superior (`ri-paint-fill`).
+- Añadir slider de tolerancia en la barra lateral (oculto por defecto, visible con la herramienta activa).
+
+#### [MODIFY] [main.js]
+- Implementar `floodFill(ctx, startX, startY, fillColor, tolerance)`:
+  - Leer imagen con `getImageData()`.
+  - BFS/DFS desde el pixel初始, expandir mientras el color différence < tolerancia.
+  - Escribir con `putImageData()`.
+- Manejar pointerdown en modo fill: calcular posición canvas, ejecutar floodFill.
+
+---
+
+## 4. Selección + Transform
+
+Herramienta de selección rectangular o libre + transformación (mover, escalar, rotar).
+
+#### [MODIFY] [index.html]
+- Añadir botón de selección en la barra superior (`ri-checkbox-blank-line`).
+- Añadir panel de transformación flotante con: mover, escalar, rotar, confirmar, cancelar.
+
+#### [MODIFY] [main.js]
+- **Selección:**
+  - Modo `selection`: dibujar rectángulo de selección con dashed border animada.
+  - Guardar bounds de selección.
+  - Copiar pixels seleccionados a un canvas temporal offscreen.
+- **Transform:**
+  - Al confirmar selección → modo transform.
+  - Dibujar handle points en las esquinas y bordes.
+  - Arrastrar handle → escalar; arrastrar dentro → mover; gesto rotación → rotar.
+  - Aplicar con `drawImage()` al canvas activo en posición final.
+
+---
+
+## 5. Guías de Dibujo (Drawing Assist)
+
+#### 5a. Línea recta (QuickLine)
+Mantener pulsado y arrastrar → línea recta desde el punto初始 (hold to constrain angle).
+
+#### 5b. Simetría vertical/horizontal
+Guía visual de simetría + dibujar en un lado se refleja al otro.
+
+#### [MODIFY] [index.html]
+- Añadir botón de guías en la barra superior (`ri-ruler-line`).
+- Menú desplegable: Ninguna, Recta, Simetría V, Simetría H, Simetría 4.
+
+#### [MODIFY] [main.js]
+- **QuickLine:** En pointerdown, guardar punto初始. En pointermove con shift o long-press, calcular ángulo más cercano (0, 45, 90, etc.) y dibujar línea recta.
+- **Simetría:** Antes de cada draw(), duplicar el trazo simétricamente:
+  - V: reflejar X相对于 canvas center
+  - H: reflejar Y相对于 canvas center
+  - 4: reflejar ambos ejes
+- Dibujar guía visual de simetría (línea punteada) en un canvas overlay.
+
+---
+
+## 6. Alpha Lock (Tranparencia de capa)
+
+Bloquear transparencia: solo pintar sobre píxeles existentes de la capa.
+
+#### [MODIFY] [index.html]
+- Añadir icono de alpha lock en el panel de capas (`ri-lock-unlock-line`).
+
+#### [MODIFY] [main.js]
+- Añadir `alphaLock: false` al objeto layer.
+- Al dibujar con alpha lock activo:
+  - Antes del trazo, guardar máscara de alpha con `getImageData()`.
+  - Después del trazo, restaurar alpha original: comparar pixel original, si era transparente, restaurar transparencia.
+- Implementación eficiente: usar `globalCompositeOperation = 'source-atop'` temporalmente.
+
+---
+
+## 7. Copiar / Pegar
+
+Copiar selección completa o porción, pegar como nueva capa flotante.
+
+#### [MODIFY] [index.html]
+- Añadir menú contextual con Copiar, Pegar, Duplicar, Cortar (accesible desde selección o long-press en capa).
+
+#### [MODIFY] [main.js]
+- **Copiar:** Guardar imagen de la capa activa (o selección) en un buffer temporal.
+- **Pegar:** Crear nueva capa con el contenido del buffer.
+- **Duplicar:** Copiar + Pegar automático.
+- **Cortar:** Copiar + Clear capa.
+- Buffer: `clipboardCanvas` (canvas offscreen temporal).
+
+---
+
+## 8. Modos de Fusión de Capas
+
+Al menos: Normal, Multiplicar, Trama, Superponer, Aclarar, Oscurecer.
+
+#### [MODIFY] [index.html]
+- Añadir selector de modo de fusión en el panel de capas.
+
+#### [MODIFY] [main.js]
+- Añadir `blendMode: 'source-over'` al objeto layer.
+- Opciones de blend mode con sus equivalentes canvas:
+  - Normal → `source-over`
+  - Multiplicar → `multiply`
+  - Trama → `screen`
+  - Superponer → `overlay`
+  - Aclarar → `lighter`
+  - Oscurecer → `darken`
+- Aplicar: `ctx.globalCompositeOperation = layer.blendMode` al renderizar.
+- NOTA: Para que funcione, el renderizado debe ser manual (no por CSS stacking). Habrá que implementar un `renderComposite()` que pinte todas las capas en un canvas visible en orden, aplicando blend modes.
+
+---
+
+## 9. QuickShape (Formas Geométricas)
+
+Mantener pulsado al final de un trazo → convertir a forma perfecta.
+
+#### [MODIFY] [main.js]
+- Detectar long-press al final del trazo (pointerup con duración > 400ms y movimiento < threshold).
+- Analizar la forma del trazo:
+  - **Círculo:** Si los puntos forman una ruta cerrada roughly circular.
+  - **Rectángulo:** Si los puntos forman un rectángulo roughly.
+  - **Línea recta:** Si la distancia entre inicio y fin es > 80% del largo total.
+- Reemplazar trazo original con la forma idealizada.
+
+---
+
+## 10. Barra de Deshacer/Hacer (Undo Slider)
+
+Barra horizontal en la parte inferior estilo Procreate: deslizar para navegar el historial.
+
+#### [MODIFY] [index.html]
+- Añadir `<div id="undo-bar">` oculto con track y thumb.
+
+#### [MODIFY] [style.css]
+- Estilo tipo Procreate: barra delgada, thumb circular, aparece temporalmente.
+
+#### [MODIFY] [main.js]
+- En lugar de undo/redo instantáneos, mostrar la barra al hacer long-press en los botones.
+- Permitir scrub para navegar el historial visualmente.
+- Desaparece al soltar.
+
+---
+
+## 11. Redimensionar lienzo
+
+Opción de cambiar el tamaño del canvas (mantener proporciones o libre).
+
+#### [MODIFY] [index.html]
+- Añadir opción en menú de ajustes.
+
+#### [MODIFY] [main.js]
+- Canvas temporal offscreen → redibujar todas las capas escaladas → reemplazar canvases.
+- Opciones: mantner proporciones, centrar contenido.
+
+---
+
+## 12. Reordenar capas (Drag & Drop)
+
+Arrastrar capas arriba/abajo en el panel para reordenar.
+
+#### [MODIFY] [main.js]
+- Implementar drag & drop en los `.layer-item` del panel.
+- Al soltar: reordenar array `layers[]`, reordenar canvases en el DOM, re-renderizar UI.
+
+---
+
+## Verification Plan
+
+### Manual Testing (iPad 5th gen)
+1. Long-press para eyedropper → verificar que captura el color correcto.
+2. Cambiar opacidad de capa → verificar transparencia visual.
+3. Flood fill en área cerrada → verificar que rellena correctamente.
+4. Selección rectangular + mover contenido.
+5. Simetría vertical → dibujar en un lado, verificar reflejo.
+6. Alpha lock → pintar sobre zona transparente, verificar que no pinta fuera.
+7. Copiar/pegar capa → verificar nueva capa con mismo contenido.
+8. Cambiar blend mode → verificar efecto visual (multiply, screen).
+9. QuickLine → mantener pulsado + arrastrar → línea recta.
+10. QuickShape → trazo circular mantenido → círculo perfecto.
+11. Undo slider → navegar historial.
+12. Reordenar capas con drag & drop.
+13. Auto-save → refrescar navegador → verificar que todo se conserva.
+14. Exportar PNG → verificar imagen completa con todas las capas.
