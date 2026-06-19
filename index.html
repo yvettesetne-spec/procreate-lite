@@ -1248,8 +1248,10 @@
     <!-- Debug Panel -->
     <div id="debug-panel" style="position:fixed;bottom:0;left:0;right:0;background:#ff0000;color:#fff;padding:4px;font-size:10px;z-index:99999;max-height:100px;overflow:auto;display:none;"></div>
 
-    <script src="main.js"></script>
+    <script src="main.js?v=20240620"></script>
     <script>
+        console.log('main.js loaded:', typeof init);
+        alert('App loaded'); // Debug to confirm JS runs
         // Global error handler for debug
         window.addEventListener('error', (e) => {
             const panel = document.getElementById('debug-panel');
