@@ -1,0 +1,20 @@
+<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iPad Touch Test</title>
+<style>
+body{margin:0;padding:20px;background:#333;color:#fff;font-family:sans-serif}
+.test-btn{background:#007aff;color:#fff;border:none;padding:20px;margin:10px;min-width:100px;font-size:18px;border-radius:8px}
+.test-btn2{background:#ff3b30;color:#fff;padding:20px;margin:10px;min-width:100px;font-size:18px;border-radius:8px}
+a{color:#fff;padding:20px;margin:10px;display:inline-block;background:#007aff;border-radius:8px}
+</style>
+</head>
+<body>
+<h1>Botón Test</h1>
+<button class="test-btn" onclick="alert('Button OK')">Botón HTML</button>
+<a href="#" onclick="alert('Anchor OK');return false">Anchor Link</a>
+<p id="status">Esperando toque...</p>
+<script>
+document.addEventListener('touchend',()=>document.getElementById('status').textContent='Toque detectado',{passive:true});
+</script>
+</body></html>
