@@ -24,11 +24,11 @@
                 <button class="tool-btn text-btn" id="btn-gallery">Galeria</button>
             </div>
             <div class="top-bar-right" role="toolbar" aria-label="Herramientas principales">
-<button class="tool-btn-style active" id="btn-brush" aria-label="Pincel" aria-pressed="true" onclick="event.stopPropagation();console.log('brush clicked');alert('brush mode');window.setMode('brush');return false;" onpointerdown="event.stopPropagation();event.preventDefault();console.log('brush pointer');window.setMode('brush');return false;">Brush</button>
-<button class="tool-btn-style" id="btn-smudge" aria-label="Difuminar" aria-pressed="false" onclick="event.stopPropagation();console.log('smudge clicked');alert('smudge mode');window.setMode('smudge');return false;" onpointerdown="event.stopPropagation();event.preventDefault();console.log('smudge pointer');window.setMode('smudge');return false;">Smudge</button>
-<button class="tool-btn-style" id="btn-eraser" aria-label="Borrador" aria-pressed="false" onclick="event.stopPropagation();console.log('eraser clicked');alert('eraser mode');window.setMode('eraser');return false;" onpointerdown="event.stopPropagation();event.preventDefault();console.log('eraser pointer');window.setMode('eraser');return false;">Erase</button>
-<button class="tool-btn-style" id="btn-layers" aria-label="Capas" aria-pressed="false" onclick="event.stopPropagation();console.log('layers clicked');window.toggleLayersPanel();return false;" onpointerdown="event.stopPropagation();event.preventDefault();window.toggleLayersPanel();return false;">Layers</button>
-<button class="tool-btn-style color-btn-wrapper" id="btn-color" aria-label="Selector de color" onclick="event.stopPropagation();console.log('color clicked');window.setupUI();return false;" onpointerdown="event.stopPropagation();event.preventDefault();window.setupUI();return false;">
+<button class="tool-btn-style active" id="btn-brush" aria-label="Pincel" aria-pressed="true">Brush</button>
+<button class="tool-btn-style" id="btn-smudge" aria-label="Difuminar" aria-pressed="false">Smudge</button>
+<button class="tool-btn-style" id="btn-eraser" aria-label="Borrador" aria-pressed="false">Erase</button>
+<button class="tool-btn-style" id="btn-layers" aria-label="Capas" aria-pressed="false">Layers</button>
+<button class="tool-btn-style color-btn-wrapper" id="btn-color" aria-label="Selector de color">
     <div class="color-indicator" id="current-color-indicator"></div>
 </button>
 </div>
@@ -1026,49 +1026,21 @@
     <canvas id="grid-overlay-canvas" class="grid-overlay hidden"></canvas>
 
     <!-- Debug Panel -->
-    <!-- Debug overlay info -->
-<div id="touch-debug" style="position:fixed;top:50px;right:10px;background:red;color:white;padding:4px;font-size:10px;z-index:99999;">TOUCH TEST</div>
-
-    <script>
-// Immediate functions for inline onclick
-window.setMode = function(m) { 
-    window.currentMode = m;
-    document.querySelectorAll('.tool-btn, .tool-btn-style').forEach(b => b.classList.remove('active'));
-    const btn = document.getElementById('btn-' + m);
-    if (btn) btn.classList.add('active');
-    console.log('Mode set to:', m);
-};
-window.toggleLayersPanel = function() {
-    const p = document.getElementById('layers-panel');
-    if (p) p.classList.toggle('hidden');
-    console.log('Layers toggled');
-};
-window.setupUI = function() {
-    const c = prompt('Color (hex):', window.brushColor || '#ffffff');
-    if (c) {
-        window.brushColor = c;
-        const ind = document.getElementById('current-color-indicator');
-        if (ind) ind.style.backgroundColor = window.brushColor;
-        console.log('Color set:', c);
-    }
-};
-console.log('Inline handlers ready');
-</script>
+<script src="src/canvas.js"></script>
+<script src="src/brushes.js"></script>
+<script src="src/layers.js"></script>
+<script src="src/modals.js"></script>
+<script src="src/smoothing.js"></script>
+<script src="src/harmony.js"></script>
+<script src="src/groups.js"></script>
 <script src="main.js?v=20240620"></script>
-    <script>
-console.log('main.js loaded:', typeof init);
-// Global error handler for debug
+<script>
 window.addEventListener('error', (e) => {
-    const panel = document.getElementById('debug-panel');
-    if (panel) {
-        panel.style.display = 'block';
-        panel.textContent += (e.error ? e.error.message : e.message) + ' | ';
-    }
+    console.error(e.error ? e.error.message : e.message);
 });
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 </script>
-    </script>
 </body>
 </html>

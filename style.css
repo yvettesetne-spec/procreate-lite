@@ -43,7 +43,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid red !important;
 }
 .tool-btn i {
     pointer-events: auto !important;
@@ -177,7 +176,29 @@ body, html {
 
 .tool-btn:active, .tool-btn.touched {
     background-color: rgba(255, 255, 255, 0.1);
-    outline: 2px solid red !important;
+}
+
+/* Top bar mode toggle buttons (Brush, Smudge, Erase, Layers, Color) */
+.tool-btn-style {
+    background: transparent;
+    border: none;
+    color: var(--icon-color);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 6px 14px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
+}
+.tool-btn-style.active {
+    color: var(--icon-active);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+.tool-btn-style:hover {
+    background-color: rgba(255, 255, 255, 0.08);
 }
 
 .tool-btn:hover {
