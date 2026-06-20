@@ -329,6 +329,8 @@ function handlePointerDown(e) {
     if (e.pointerType === 'touch') return;
     var c = getClientCoords(e);
     var pos = getCanvasPos(c.x, c.y);
+    var r = canvasContainer.getBoundingClientRect();
+    showToast('C: ' + Math.round(pos.x) + ',' + Math.round(pos.y) + ' | Rect: l=' + Math.round(r.left) + ' t=' + Math.round(r.top) + ' w=' + Math.round(r.width) + ' h=' + Math.round(r.height), 4000);
     isDrawing = true;
     points = [{ x: pos.x, y: pos.y }];
     smoothBuffer = [{ x: pos.x, y: pos.y }];
@@ -637,7 +639,7 @@ function updateColorIndicator() {
 }
 
 // === Toast / Alert ===
-function showToast(msg) {
+function showToast(msg, duration) {
     var el = document.getElementById('toast-message');
     if (!el) {
         el = document.createElement('div');
@@ -648,7 +650,7 @@ function showToast(msg) {
     el.textContent = msg;
     el.style.opacity = '1';
     clearTimeout(el._timeout);
-    el._timeout = setTimeout(function() { el.style.opacity = '0'; }, 2000);
+    el._timeout = setTimeout(function() { el.style.opacity = '0'; }, duration || 2000);
 }
 
 function showAlert(title, message) {
