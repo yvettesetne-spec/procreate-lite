@@ -422,7 +422,23 @@ function handlePointerMove(e) {
     var c = getClientCoords(e);
     var pos = getCanvasPos(c.x, c.y);
     points.push({ x: pos.x, y: pos.y });
-    smoothBuffer.push({ x: pos.x, y: pos.y });
+
+    // Stabilization: windowed moving average
+    var sx, sy;
+    if (stabilizationLevel > 0 && points.length >= 2) {
+        var windowSize = Math.min(points.length, Math.max(1, Math.round(stabilizationLevel / 12)));
+        var sumX = 0, sumY = 0;
+        for (var i = points.length - windowSize; i < points.length; i++) {
+            sumX += points[i].x;
+            sumY += points[i].y;
+        }
+        sx = sumX / windowSize;
+        sy = sumY / windowSize;
+    } else {
+        sx = pos.x;
+        sy = pos.y;
+    }
+    smoothBuffer.push({ x: sx, y: sy });
     drawStroke();
 }
 
