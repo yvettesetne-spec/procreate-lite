@@ -14,7 +14,6 @@ var brushColor = '#ffffff';
 var isDrawing = false;
 var points = [];
 var smoothBuffer = [];
-var predPoints = [];
 var canvasContainer;
 const MAX_LAYERS = 30;
 var layerIdCounter = 1;
@@ -317,11 +316,9 @@ function getClientCoords(e) {
 
 function getCanvasPos(clientX, clientY) {
     var rect = canvasContainer.getBoundingClientRect();
-    var scaleX = rect.width / logicalWidth;
-    var scaleY = rect.height / logicalHeight;
     return {
-        x: (clientX - rect.left) / scaleX,
-        y: (clientY - rect.top) / scaleY
+        x: clientX - rect.left,
+        y: clientY - rect.top
     };
 }
 
@@ -330,18 +327,9 @@ function handlePointerDown(e) {
     if (e.pointerType === 'touch') return;
     var c = getClientCoords(e);
     var pos = getCanvasPos(c.x, c.y);
-    // DEBUG: draw a red dot at touch position
-    var layer = layers[activeLayerIndex];
-    if (layer) {
-        layer.ctx.fillStyle = '#ff0000';
-        layer.ctx.beginPath();
-        layer.ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
-        layer.ctx.fill();
-    }
     isDrawing = true;
     points = [{ x: pos.x, y: pos.y }];
     smoothBuffer = [{ x: pos.x, y: pos.y }];
-    predPoints = [{ x: pos.x, y: pos.y, t: performance.now() }];
     saveUndoState();
 }
 
@@ -350,19 +338,8 @@ function handlePointerMove(e) {
     if (!isDrawing) return;
     var c = getClientCoords(e);
     var pos = getCanvasPos(c.x, c.y);
-    // DEBUG: draw a small dot along touch path
-    var layer = layers[activeLayerIndex];
-    if (layer) {
-        layer.ctx.fillStyle = '#ff0000';
-        layer.ctx.beginPath();
-        layer.ctx.arc(pos.x, pos.y, 2, 0, Math.PI * 2);
-        layer.ctx.fill();
-    }
-    var now = performance.now();
     points.push({ x: pos.x, y: pos.y });
     smoothBuffer.push({ x: pos.x, y: pos.y });
-    predPoints.push({ x: pos.x, y: pos.y, t: now });
-    if (predPoints.length > 4) predPoints.shift();
     drawStroke();
 }
 
@@ -371,7 +348,6 @@ function handlePointerUp() {
     isDrawing = false;
     points = [];
     smoothBuffer = [];
-    predPoints = [];
     var layer = layers[activeLayerIndex];
     if (layer) layer.ctx.beginPath();
 }
@@ -385,11 +361,22 @@ function drawStroke() {
     layer.ctx.strokeStyle = brushColor;
     layer.ctx.globalCompositeOperation = currentMode === 'eraser' ? 'destination-out' : 'source-over';
     layer.ctx.globalAlpha = brushOpacity;
-    var prev = smoothBuffer[smoothBuffer.length - 2];
-    var curr = smoothBuffer[smoothBuffer.length - 1];
+    var buf = smoothBuffer;
+    var len = buf.length;
+    if (len < 3) {
+        var p0 = buf[0], p1 = buf[1];
+        layer.ctx.beginPath();
+        layer.ctx.moveTo(p0.x, p0.y);
+        layer.ctx.lineTo(p1.x, p1.y);
+        layer.ctx.stroke();
+        return;
+    }
+    var p0 = buf[len - 3], p1 = buf[len - 2], p2 = buf[len - 1];
+    var mx0 = (p0.x + p1.x) / 2, my0 = (p0.y + p1.y) / 2;
+    var mx1 = (p1.x + p2.x) / 2, my1 = (p1.y + p2.y) / 2;
     layer.ctx.beginPath();
-    layer.ctx.moveTo(prev.x, prev.y);
-    layer.ctx.lineTo(curr.x, curr.y);
+    layer.ctx.moveTo(mx0, my0);
+    layer.ctx.quadraticCurveTo(p1.x, p1.y, mx1, my1);
     layer.ctx.stroke();
 }
 
