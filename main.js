@@ -329,6 +329,7 @@ function handlePointerDown(e) {
     if (e.pointerType === 'touch') return;
     var c = getClientCoords(e);
     var pos = getCanvasPos(c.x, c.y);
+    showToast('DOWN ' + Math.round(c.x) + ',' + Math.round(c.y) + ' w=' + canvasContainer.offsetWidth);
     isDrawing = true;
     points = [{ x: pos.x, y: pos.y }];
     smoothBuffer = [{ x: pos.x, y: pos.y }];
