@@ -423,22 +423,32 @@ function handlePointerMove(e) {
     var pos = getCanvasPos(c.x, c.y);
     points.push({ x: pos.x, y: pos.y });
 
-    // Stabilization: windowed moving average
-    var sx, sy;
-    if (stabilizationLevel > 0 && points.length >= 2) {
-        var windowSize = Math.min(points.length, Math.max(1, Math.round(stabilizationLevel / 12)));
-        var sumX = 0, sumY = 0;
-        for (var i = points.length - windowSize; i < points.length; i++) {
-            sumX += points[i].x;
-            sumY += points[i].y;
+    // Stabilization: exponential moving average + distance threshold
+    if (stabilizationLevel > 0 && smoothBuffer.length > 0) {
+        var last = smoothBuffer[smoothBuffer.length - 1];
+        var dx = pos.x - last.x;
+        var dy = pos.y - last.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+
+        // Distance threshold: filter micro-jitter (tiny vibrations)
+        var minDist = 0.5 + stabilizationLevel * 0.1; // 0.5 to ~10.5
+        if (dist < minDist) {
+            // Nudge last point slightly instead of adding a new one
+            var f = dist / (minDist || 1);
+            last.x += dx * f * 0.2;
+            last.y += dy * f * 0.2;
+            drawStroke();
+            return;
         }
-        sx = sumX / windowSize;
-        sy = sumY / windowSize;
+
+        // Exponential moving average
+        var weight = Math.max(0.08, 1 - stabilizationLevel / 108);
+        var sx = last.x + dx * weight;
+        var sy = last.y + dy * weight;
+        smoothBuffer.push({ x: sx, y: sy });
     } else {
-        sx = pos.x;
-        sy = pos.y;
+        smoothBuffer.push({ x: pos.x, y: pos.y });
     }
-    smoothBuffer.push({ x: sx, y: sy });
     drawStroke();
 }
 
