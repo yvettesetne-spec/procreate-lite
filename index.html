@@ -24,9 +24,9 @@
                 <button class="tool-btn text-btn" id="btn-gallery">Galeria</button>
             </div>
             <div class="top-bar-right" role="toolbar" aria-label="Herramientas principales">
-<button class="tool-btn-style active" id="btn-brush" aria-label="Pincel" aria-pressed="true">Brush</button>
-<button class="tool-btn-style" id="btn-smudge" aria-label="Difuminar" aria-pressed="false">Smudge</button>
-<button class="tool-btn-style" id="btn-eraser" aria-label="Borrador" aria-pressed="false">Erase</button>
+<button class="tool-btn-style active" id="btn-brush" aria-label="Pincel" aria-pressed="true" ontouchstart="event.preventDefault();window.setMode('brush');return false;" onmousedown="event.preventDefault();window.setMode('brush');return false;">Brush</button>
+<button class="tool-btn-style" id="btn-smudge" aria-label="Difuminar" aria-pressed="false" ontouchstart="event.preventDefault();window.setMode('smudge');return false;" onmousedown="event.preventDefault();window.setMode('smudge');return false;">Smudge</button>
+<button class="tool-btn-style" id="btn-eraser" aria-label="Borrador" aria-pressed="false" ontouchstart="event.preventDefault();window.setMode('eraser');return false;" onmousedown="event.preventDefault();window.setMode('eraser');return false;">Erase</button>
 <button class="tool-btn-style" id="btn-layers" aria-label="Capas" aria-pressed="false">Layers</button>
 <button class="tool-btn-style color-btn-wrapper" id="btn-color" aria-label="Selector de color">
     <div class="color-indicator" id="current-color-indicator"></div>
