@@ -20,8 +20,13 @@
     <div id="app-container" role="application" aria-label="Procreate Lite - Aplicación de dibujo">
         <!-- Top Toolbar -->
         <header class="top-bar" role="toolbar" aria-label="Barra de herramientas principal" style="pointer-events:auto !important;">
-            <div class="top-bar-left" style="pointer-events:auto !important;">
+            <div class="top-bar-left" style="pointer-events:auto !important;display:flex;align-items:center;gap:8px;">
                 <button class="tool-btn text-btn" id="btn-gallery">Galeria</button>
+                <div style="display:flex;align-items:center;gap:4px;">
+                    <label for="stabilization-slider" style="font-size:9px;color:var(--text-secondary);white-space:nowrap;">Estab</label>
+                    <input type="range" id="stabilization-slider" min="0" max="100" value="5" style="width:60px;height:3px;-webkit-appearance:none;appearance:none;background:#555;border-radius:2px;outline:none;vertical-align:middle;">
+                    <span id="stabilization-slider-val" style="font-size:9px;color:var(--text-secondary);min-width:16px;text-align:right;">5</span>
+                </div>
             </div>
             <div class="top-bar-right" role="toolbar" aria-label="Herramientas principales">
 <button class="tool-btn-style active" id="btn-brush" aria-label="Pincel" aria-pressed="true">Brush</button>
@@ -42,10 +47,6 @@
                     <input type="range" id="size-slider" min="1" max="100" value="10" orient="vertical" class="vertical-slider" aria-label="Tamaño de pincel">
                 </div>
                 
-                <div class="slider-container" style="position:relative;">
-                    <input type="range" id="stabilization-slider" min="0" max="100" value="5" orient="vertical" class="vertical-slider stabilization-slider" title="Estabilización" aria-label="Estabilización">
-                    <span id="stabilization-slider-val" style="font-size:9px;color:var(--text-secondary);text-align:center;margin-top:-22px;">5</span>
-                </div>
                 
                 <div class="undo-redo-container" role="toolbar" aria-label="Deshacer/rehacer">
                     <button class="tool-btn small" id="btn-undo" aria-label="Deshacer"><i class="ri-arrow-go-back-line"></i></button>

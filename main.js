@@ -105,12 +105,20 @@ function setupEventListeners() {
     // Sliders
     bindSlider('size-slider', function(v) { brushSize = parseInt(v); });
     bindSlider('opacity-slider', function(v) { brushOpacity = parseInt(v) / 100; });
-    bindSlider('stabilization-slider', function(v) {
-        stabilizationLevel = parseInt(v);
-        var valSpan = document.getElementById('stabilization-slider-val');
-        if (valSpan) valSpan.textContent = v;
-        showToast('Estabilización: ' + v);
-    });
+    (function() {
+        var stabEl = document.getElementById('stabilization-slider');
+        function onStabChange() {
+            var v = stabEl.value;
+            stabilizationLevel = parseInt(v);
+            var valSpan = document.getElementById('stabilization-slider-val');
+            if (valSpan) valSpan.textContent = v;
+            showToast('Estab: ' + v);
+        }
+        if (stabEl) {
+            stabEl.addEventListener('input', onStabChange);
+            stabEl.addEventListener('change', onStabChange);
+        }
+    })();
 
     // Brush studio sliders
     bindSlider('brush-spacing', function(v) { currentBrushConfig.spacing = parseInt(v); document.getElementById('brush-spacing-val').textContent = v; });
