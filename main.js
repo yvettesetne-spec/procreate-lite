@@ -29,6 +29,11 @@ var defaultEffects = {
 };
 var stabilizationLevel = 5;
 var currentBrush = 'solid';
+var currentBrushConfig = {
+    spacing: 4, scatter: 0, jitter: 0, rotation: 0, dirRotation: 0,
+    colorDynamics: 0, wetMix: 0, dual: false, dualType: 'airbrush',
+    pressureResponsive: true, stabilization: 0
+};
 var currentGuide = 'none';
 var isBlendPreview = false;
 var isOnionSkin = false;
@@ -85,8 +90,7 @@ function setupEventListeners() {
     bindClick('btn-smudge', function() { setMode('smudge'); });
     bindClick('btn-layers', toggleLayersPanel);
     bindClick('btn-color', function() {
-        var c = prompt('Color (hex):', brushColor);
-        if (c) { brushColor = c; updateColorIndicator(); }
+        togglePanel('color-panel');
     });
     bindClick('btn-gallery', function() { togglePanel('gallery-view'); });
     bindClick('btn-export', function() { togglePanel('export-presets-panel'); });
@@ -104,6 +108,19 @@ function setupEventListeners() {
     bindSlider('size-slider', function(v) { brushSize = parseInt(v); });
     bindSlider('opacity-slider', function(v) { brushOpacity = parseInt(v) / 100; });
     bindSlider('stabilization-slider', function(v) { stabilizationLevel = parseInt(v); });
+
+    // Brush studio sliders
+    bindSlider('brush-spacing', function(v) { currentBrushConfig.spacing = parseInt(v); document.getElementById('brush-spacing-val').textContent = v; });
+    bindSlider('brush-scatter', function(v) { currentBrushConfig.scatter = parseInt(v); document.getElementById('brush-scatter-val').textContent = v; });
+    bindSlider('brush-jitter', function(v) { currentBrushConfig.jitter = parseInt(v); document.getElementById('brush-jitter-val').textContent = v; });
+    bindSlider('brush-stabilization', function(v) { currentBrushConfig.stabilization = parseInt(v); });
+    bindSlider('brush-rotation', function(v) { currentBrushConfig.rotation = parseInt(v); document.getElementById('brush-rotation-val').textContent = v; });
+    bindSlider('brush-dir-rotation', function(v) { currentBrushConfig.dirRotation = parseInt(v); document.getElementById('brush-dir-rotation-val').textContent = v; });
+    bindSlider('brush-color-dynamics', function(v) { currentBrushConfig.colorDynamics = parseInt(v); document.getElementById('brush-color-dynamics-val').textContent = v; });
+    bindSlider('brush-wet-mix', function(v) { currentBrushConfig.wetMix = parseInt(v); document.getElementById('brush-wet-mix-val').textContent = v; });
+
+    // Wet mix slider changes smudge behavior
+    var wetMixSlider = document.getElementById('brush-wet-mix');
 
     // Canvas drawing — pointer events (Apple Pencil / active stylus / desktop mouse)
     canvasContainer.addEventListener('pointerdown', handlePointerDown);
@@ -183,6 +200,12 @@ function setupEventListeners() {
     // Gradient
     bindClick('btn-gradient-apply', function() { showToast('Degradado aplicado'); });
     bindClick('btn-gradient-cancel', function() { togglePanel('gradient-panel'); });
+    bindClick('btn-clear-recent-colors', function() {
+        var container = document.getElementById('recent-colors');
+        if (container) container.innerHTML = '';
+        try { localStorage.removeItem('recentColors'); } catch(e) {}
+        showToast('Historial limpiado');
+    });
 
     // Export
     bindClick('btn-export-jpeg-go', function() { exportCanvas('jpeg'); });
@@ -222,9 +245,55 @@ function setupEventListeners() {
     document.querySelectorAll('.color-preset').forEach(function(el) {
         el.addEventListener('click', function() {
             var color = el.dataset.color;
-            if (color) { brushColor = color; updateColorIndicator(); }
+            if (color) { brushColor = color; updateColorIndicator(); addRecentColor(color); }
         });
     });
+
+    // Hex input in color panel
+    var hexInput = document.getElementById('hex-input');
+    if (hexInput) {
+        hexInput.addEventListener('input', function() {
+            var val = this.value.trim();
+            if (/^#[0-9a-f]{6}$/i.test(val)) {
+                brushColor = val;
+                updateColorIndicator();
+                addRecentColor(val);
+            }
+        });
+        hexInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                var val = this.value.trim();
+                if (!/^#/.test(val)) val = '#' + val;
+                if (/^#[0-9a-f]{6}$/i.test(val)) {
+                    brushColor = val;
+                    updateColorIndicator();
+                    addRecentColor(val);
+                }
+            }
+        });
+    }
+
+    // Native color picker (hidden input for iOS)
+    var colorPickerInput = document.getElementById('color-picker-input');
+    if (colorPickerInput) {
+        colorPickerInput.addEventListener('input', function() {
+            brushColor = this.value;
+            updateColorIndicator();
+            addRecentColor(this.value);
+        });
+    }
+
+    // Add a button to open native picker inside color panel
+    var cpHeader = document.querySelector('#color-panel .panel-header');
+    if (cpHeader && colorPickerInput) {
+        var nativeBtn = document.createElement('button');
+        nativeBtn.className = 'tool-btn small';
+        nativeBtn.innerHTML = '<i class="ri-palette-line"></i>';
+        nativeBtn.title = 'Selector nativo de iOS';
+        nativeBtn.style.cssText = 'float:right;width:32px;height:32px;font-size:16px;';
+        nativeBtn.addEventListener('click', function() { colorPickerInput.click(); });
+        cpHeader.appendChild(nativeBtn);
+    }
 
     // BG color swatches
     document.querySelectorAll('.bg-swatch').forEach(function(el) {
@@ -243,6 +312,25 @@ function setupEventListeners() {
             document.querySelectorAll('.layer-item[data-brush]').forEach(function(b) { b.classList.remove('active'); });
             el.classList.add('active');
             currentBrush = el.dataset.brush;
+            if (brushStudio[currentBrush]) {
+                currentBrushConfig = Object.assign({}, brushStudio[currentBrush]);
+                // Sync studio sliders to brush config
+                var setSVal = function(id, val) {
+                    var sl = document.getElementById(id);
+                    var sp = document.getElementById(id + '-val');
+                    if (sl) sl.value = val;
+                    if (sp) sp.textContent = val;
+                };
+                setSVal('brush-spacing', currentBrushConfig.spacing);
+                setSVal('brush-scatter', currentBrushConfig.scatter);
+                setSVal('brush-jitter', currentBrushConfig.jitter);
+                setSVal('brush-rotation', currentBrushConfig.rotation);
+                setSVal('brush-dir-rotation', currentBrushConfig.dirRotation);
+                setSVal('brush-color-dynamics', currentBrushConfig.colorDynamics);
+                setSVal('brush-wet-mix', currentBrushConfig.wetMix);
+                var stabSlider = document.getElementById('brush-stabilization');
+                if (stabSlider) stabSlider.value = currentBrushConfig.stabilization;
+            }
             showToast('Pincel: ' + el.textContent.trim());
         });
     });
@@ -352,31 +440,94 @@ function handlePointerUp() {
     if (layer) layer.ctx.beginPath();
 }
 
+function hexToRgb(hex) {
+    var val = parseInt(hex.replace('#', ''), 16);
+    return (val >> 16) + ',' + ((val >> 8) & 255) + ',' + (val & 255);
+}
+
+function sampleColorAt(ctx, x, y) {
+    var px = Math.max(0, Math.min(logicalWidth - 1, Math.round(x)));
+    var py = Math.max(0, Math.min(logicalHeight - 1, Math.round(y)));
+    try {
+        var d = ctx.getImageData(px, py, 1, 1).data;
+        // If pixel is transparent (alpha = 0), fall back to brushColor
+        if (d[3] === 0) return hexToRgb(brushColor);
+        return d[0] + ',' + d[1] + ',' + d[2];
+    } catch(e) {
+        return hexToRgb(brushColor);
+    }
+}
+
 function drawStroke() {
     var layer = layers[activeLayerIndex];
     if (!layer || points.length < 2) return;
     layer.ctx.lineCap = 'round';
     layer.ctx.lineJoin = 'round';
     layer.ctx.lineWidth = brushSize;
-    layer.ctx.strokeStyle = brushColor;
-    layer.ctx.globalCompositeOperation = currentMode === 'eraser' ? 'destination-out' : 'source-over';
-    layer.ctx.globalAlpha = brushOpacity;
+
+    if (currentMode === 'smudge' || currentBrushConfig.wetMix > 0) {
+        // Smudge / wet mix: sample pixel color from canvas and use it
+        var buf = smoothBuffer;
+        var midIdx = Math.max(0, buf.length - 2);
+        var sampleX = buf[midIdx].x;
+        var sampleY = buf[midIdx].y;
+        var rgb = sampleColorAt(layer.ctx, sampleX, sampleY);
+        layer.ctx.strokeStyle = 'rgba(' + rgb + ',' + (brushOpacity * 0.4) + ')';
+        layer.ctx.globalCompositeOperation = 'source-over';
+        layer.ctx.globalAlpha = 1;
+    } else if (currentMode === 'eraser') {
+        layer.ctx.strokeStyle = brushColor;
+        layer.ctx.globalCompositeOperation = 'destination-out';
+        layer.ctx.globalAlpha = brushOpacity;
+    } else {
+        layer.ctx.strokeStyle = brushColor;
+        layer.ctx.globalCompositeOperation = 'source-over';
+        layer.ctx.globalAlpha = brushOpacity;
+    }
+
     var buf = smoothBuffer;
     var len = buf.length;
+    var scatter = currentBrushConfig.scatter || 0;
+    var jitter = currentBrushConfig.jitter || 0;
+
     if (len < 3) {
         var p0 = buf[0], p1 = buf[1];
+        var jx = (Math.random() - 0.5) * jitter * 0.5;
+        var jy = (Math.random() - 0.5) * jitter * 0.5;
         layer.ctx.beginPath();
         layer.ctx.moveTo(p0.x, p0.y);
-        layer.ctx.lineTo(p1.x, p1.y);
+        layer.ctx.quadraticCurveTo(
+            (p0.x + p1.x) / 2 + jx, (p0.y + p1.y) / 2 + jy,
+            p1.x, p1.y
+        );
         layer.ctx.stroke();
         return;
     }
     var p0 = buf[len - 3], p1 = buf[len - 2], p2 = buf[len - 1];
     var mx0 = (p0.x + p1.x) / 2, my0 = (p0.y + p1.y) / 2;
     var mx1 = (p1.x + p2.x) / 2, my1 = (p1.y + p2.y) / 2;
+
+    // Apply scatter (perpendicular offset) and jitter (random offset)
+    var dx = p2.x - p0.x;
+    var dy = p2.y - p0.y;
+    var segLen = Math.sqrt(dx * dx + dy * dy);
+    var scatterX = 0, scatterY = 0;
+    if (segLen > 0 && scatter > 0) {
+        var perpX = -dy / segLen;
+        var perpY = dx / segLen;
+        var sOff = (Math.random() - 0.5) * scatter * 0.3;
+        scatterX = perpX * sOff;
+        scatterY = perpY * sOff;
+    }
+    var jX = (Math.random() - 0.5) * jitter * 0.3;
+    var jY = (Math.random() - 0.5) * jitter * 0.3;
+
     layer.ctx.beginPath();
     layer.ctx.moveTo(mx0, my0);
-    layer.ctx.quadraticCurveTo(p1.x, p1.y, mx1, my1);
+    layer.ctx.quadraticCurveTo(
+        p1.x + scatterX + jX, p1.y + scatterY + jY,
+        mx1, my1
+    );
     layer.ctx.stroke();
 }
 
@@ -638,11 +789,60 @@ function newProject() {
 // === UI ===
 function setupUI() {
     updateColorIndicator();
+    loadRecentColors();
 }
 
 function updateColorIndicator() {
     var indicator = document.getElementById('current-color-indicator');
     if (indicator) indicator.style.backgroundColor = brushColor;
+    var hexInput = document.getElementById('hex-input');
+    if (hexInput) hexInput.value = brushColor.toUpperCase();
+    var previewSwatch = document.getElementById('color-preview-swatch');
+    if (previewSwatch) previewSwatch.style.backgroundColor = brushColor;
+    var colorPickerInput = document.getElementById('color-picker-input');
+    if (colorPickerInput) colorPickerInput.value = brushColor;
+}
+
+function addRecentColor(color) {
+    if (!color) return;
+    var container = document.getElementById('recent-colors');
+    if (!container) return;
+    var existing = container.querySelectorAll('.color-preset');
+    for (var i = 0; i < existing.length; i++) {
+        if (existing[i].dataset.color === color) {
+            container.removeChild(existing[i]);
+            break;
+        }
+    }
+    var swatch = document.createElement('div');
+    swatch.className = 'color-preset';
+    swatch.style.background = color;
+    swatch.dataset.color = color;
+    swatch.addEventListener('click', function() {
+        brushColor = color;
+        updateColorIndicator();
+    });
+    container.insertBefore(swatch, container.firstChild);
+    while (container.children.length > 12) container.removeChild(container.lastChild);
+    try { localStorage.setItem('recentColors', JSON.stringify(Array.from(container.querySelectorAll('.color-preset')).map(function(s) { return s.dataset.color; }))); } catch(e) {}
+}
+
+function loadRecentColors() {
+    var container = document.getElementById('recent-colors');
+    if (!container) return;
+    try {
+        var stored = JSON.parse(localStorage.getItem('recentColors'));
+        if (stored && Array.isArray(stored)) {
+            stored.forEach(function(c) {
+                var swatch = document.createElement('div');
+                swatch.className = 'color-preset';
+                swatch.style.background = c;
+                swatch.dataset.color = c;
+                swatch.addEventListener('click', function() { brushColor = c; updateColorIndicator(); });
+                container.appendChild(swatch);
+            });
+        }
+    } catch(e) {}
 }
 
 // === Toast / Alert ===
