@@ -362,18 +362,22 @@ function handlePointerUp() {
 }
 
 function drawPredicted(now) {
-    if (predPoints.length < 2) return;
+    if (predPoints.length < 3) return;
     var layer = layers[activeLayerIndex];
     if (!layer) return;
+    var p0 = predPoints[predPoints.length - 3];
     var p1 = predPoints[predPoints.length - 2];
     var p2 = predPoints[predPoints.length - 1];
-    var dt = (p2.t - p1.t) / 1000;
-    if (dt < 0.001) return;
-    var vx = (p2.x - p1.x) / dt;
-    var vy = (p2.y - p1.y) / dt;
-    var lookAhead = 0.04;
+    var dt1 = (p1.t - p0.t) / 1000;
+    var dt2 = (p2.t - p1.t) / 1000;
+    if (dt1 < 0.001 || dt2 < 0.001) return;
+    var vx = ((p2.x - p1.x) / dt2 + (p1.x - p0.x) / dt1) / 2;
+    var vy = ((p2.y - p1.y) / dt2 + (p1.y - p0.y) / dt1) / 2;
+    var lookAhead = 0.025;
     var predX = p2.x + vx * lookAhead;
     var predY = p2.y + vy * lookAhead;
+    var dist = Math.hypot(predX - p2.x, predY - p2.y);
+    if (dist > 30) { predX = p2.x + (predX - p2.x) / dist * 30; predY = p2.y + (predY - p2.y) / dist * 30; }
     layer.ctx.beginPath();
     layer.ctx.moveTo(p2.x, p2.y);
     layer.ctx.lineTo(predX, predY);
