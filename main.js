@@ -65,15 +65,11 @@ function createBaseLayer() {
     layers.push({ canvas: canvas, ctx: ctx, visible: true, opacity: 1, id: 'layer-0', name: 'Capa 1', alphaLock: false, blendMode: 'source-over', maskData: null, clippingMask: false, effects: JSON.parse(JSON.stringify(defaultEffects)) });
 }
 
-// === Helper: bind click+touchend to a button ===
+// === Helper: bind click to a button element ===
 function bindClick(id, fn) {
     var el = document.getElementById(id);
     if (el) {
         el.addEventListener('click', fn);
-        el.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            fn();
-        });
     }
 }
 
