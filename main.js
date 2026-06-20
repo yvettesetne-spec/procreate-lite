@@ -64,8 +64,6 @@ function createBaseLayer() {
     canvas.className = 'canvas-layer bg-layer';
     var ctx = canvas.getContext('2d', { willReadFrequently: true });
     ctx.scale(dpr, dpr);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, logicalWidth, logicalHeight);
     canvasContainer.appendChild(canvas);
     layers.push({ canvas: canvas, ctx: ctx, visible: true, opacity: 1, id: 'layer-0', name: 'Capa 1', alphaLock: false, blendMode: 'source-over', maskData: null, clippingMask: false, effects: JSON.parse(JSON.stringify(defaultEffects)) });
 }
@@ -118,9 +116,6 @@ function setupEventListeners() {
     bindSlider('brush-dir-rotation', function(v) { currentBrushConfig.dirRotation = parseInt(v); document.getElementById('brush-dir-rotation-val').textContent = v; });
     bindSlider('brush-color-dynamics', function(v) { currentBrushConfig.colorDynamics = parseInt(v); document.getElementById('brush-color-dynamics-val').textContent = v; });
     bindSlider('brush-wet-mix', function(v) { currentBrushConfig.wetMix = parseInt(v); document.getElementById('brush-wet-mix-val').textContent = v; });
-
-    // Wet mix slider changes smudge behavior
-    var wetMixSlider = document.getElementById('brush-wet-mix');
 
     // Canvas drawing — pointer events (Apple Pencil / active stylus / desktop mouse)
     canvasContainer.addEventListener('pointerdown', handlePointerDown);
@@ -440,24 +435,6 @@ function handlePointerUp() {
     if (layer) layer.ctx.beginPath();
 }
 
-function hexToRgb(hex) {
-    var val = parseInt(hex.replace('#', ''), 16);
-    return (val >> 16) + ',' + ((val >> 8) & 255) + ',' + (val & 255);
-}
-
-function sampleColorAt(ctx, x, y) {
-    var px = Math.max(0, Math.min(logicalWidth - 1, Math.round(x)));
-    var py = Math.max(0, Math.min(logicalHeight - 1, Math.round(y)));
-    try {
-        var d = ctx.getImageData(px, py, 1, 1).data;
-        // If pixel is transparent (alpha = 0), fall back to brushColor
-        if (d[3] === 0) return hexToRgb(brushColor);
-        return d[0] + ',' + d[1] + ',' + d[2];
-    } catch(e) {
-        return hexToRgb(brushColor);
-    }
-}
-
 function drawStroke() {
     var layer = layers[activeLayerIndex];
     if (!layer || points.length < 2) return;
@@ -465,17 +442,14 @@ function drawStroke() {
     layer.ctx.lineJoin = 'round';
     layer.ctx.lineWidth = brushSize;
 
-    if (currentMode === 'smudge' || currentBrushConfig.wetMix > 0) {
-        // Smudge / wet mix: sample pixel color from canvas and use it
-        var buf = smoothBuffer;
-        var midIdx = Math.max(0, buf.length - 2);
-        var sampleX = buf[midIdx].x;
-        var sampleY = buf[midIdx].y;
-        var rgb = sampleColorAt(layer.ctx, sampleX, sampleY);
-        layer.ctx.strokeStyle = 'rgba(' + rgb + ',' + (brushOpacity * 0.4) + ')';
+    if (currentMode === 'smudge') {
+        // Smudge: very subtle blend — brush at 6% alpha to push pixels gradually
+        layer.ctx.strokeStyle = brushColor;
         layer.ctx.globalCompositeOperation = 'source-over';
-        layer.ctx.globalAlpha = 1;
+        layer.ctx.globalAlpha = 0.06;
     } else if (currentMode === 'eraser') {
+        // Eraser: canvas has no fillRect now, so destination-out erases to
+        // transparent (CSS background shows through = white)
         layer.ctx.strokeStyle = brushColor;
         layer.ctx.globalCompositeOperation = 'destination-out';
         layer.ctx.globalAlpha = brushOpacity;
