@@ -423,29 +423,17 @@ function handlePointerMove(e) {
     var pos = getCanvasPos(c.x, c.y);
     points.push({ x: pos.x, y: pos.y });
 
-    // Stabilization: exponential moving average + distance threshold
+    // Stabilization: exponential moving average
     if (stabilizationLevel > 0 && smoothBuffer.length > 0) {
         var last = smoothBuffer[smoothBuffer.length - 1];
         var dx = pos.x - last.x;
         var dy = pos.y - last.y;
-        var dist = Math.sqrt(dx * dx + dy * dy);
-
-        // Distance threshold: filter micro-jitter (tiny vibrations)
-        var minDist = 0.5 + stabilizationLevel * 0.1; // 0.5 to ~10.5
-        if (dist < minDist) {
-            // Nudge last point slightly instead of adding a new one
-            var f = dist / (minDist || 1);
-            last.x += dx * f * 0.2;
-            last.y += dy * f * 0.2;
-            drawStroke();
-            return;
-        }
-
-        // Exponential moving average
+        // EMA weight: level 0 = 1 (raw), level 100 = ~0.08 (heavy)
         var weight = Math.max(0.08, 1 - stabilizationLevel / 108);
-        var sx = last.x + dx * weight;
-        var sy = last.y + dy * weight;
-        smoothBuffer.push({ x: sx, y: sy });
+        smoothBuffer.push({
+            x: last.x + dx * weight,
+            y: last.y + dy * weight
+        });
     } else {
         smoothBuffer.push({ x: pos.x, y: pos.y });
     }
