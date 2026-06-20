@@ -105,12 +105,17 @@ function setupEventListeners() {
     bindSlider('opacity-slider', function(v) { brushOpacity = parseInt(v) / 100; });
     bindSlider('stabilization-slider', function(v) { stabilizationLevel = parseInt(v); });
 
-    // Canvas drawing
+    // Canvas drawing — pointer events (Apple Pencil / active stylus / desktop mouse)
     canvasContainer.addEventListener('pointerdown', handlePointerDown);
     canvasContainer.addEventListener('pointermove', handlePointerMove);
     canvasContainer.addEventListener('pointerup', handlePointerUp);
     canvasContainer.addEventListener('pointerleave', function() { isDrawing = false; });
     canvasContainer.addEventListener('pointercancel', function() { isDrawing = false; });
+    // Touch events fallback (finger / generic capacitive stylus on iOS)
+    canvasContainer.addEventListener('touchstart', handlePointerDown);
+    canvasContainer.addEventListener('touchmove', handlePointerMove);
+    canvasContainer.addEventListener('touchend', handlePointerUp);
+    canvasContainer.addEventListener('touchcancel', function() { isDrawing = false; });
 
     // Layer actions
     bindClick('btn-add-layer', addLayerAction);
@@ -304,14 +309,26 @@ function setMode(mode) {
     }
 }
 
-function handlePointerDown(e) {
+function getClientCoords(e) {
+    if (e.changedTouches) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+    return { x: e.clientX, y: e.clientY };
+}
+
+function getCanvasPos(clientX, clientY) {
     var rect = canvasContainer.getBoundingClientRect();
     var scaleX = rect.width / logicalWidth;
     var scaleY = rect.height / logicalHeight;
-    var pos = {
-        x: (e.clientX - rect.left) / scaleX,
-        y: (e.clientY - rect.top) / scaleY
+    return {
+        x: (clientX - rect.left) / scaleX,
+        y: (clientY - rect.top) / scaleY
     };
+}
+
+function handlePointerDown(e) {
+    // Pointer events synthesized from touch on iOS would double-fire; skip them
+    if (e.pointerType === 'touch') return;
+    var c = getClientCoords(e);
+    var pos = getCanvasPos(c.x, c.y);
     isDrawing = true;
     points = [{ x: pos.x, y: pos.y }];
     smoothBuffer = [{ x: pos.x, y: pos.y }];
@@ -319,14 +336,10 @@ function handlePointerDown(e) {
 }
 
 function handlePointerMove(e) {
+    if (e.pointerType === 'touch') return;
     if (!isDrawing) return;
-    var rect = canvasContainer.getBoundingClientRect();
-    var scaleX = rect.width / logicalWidth;
-    var scaleY = rect.height / logicalHeight;
-    var pos = {
-        x: (e.clientX - rect.left) / scaleX,
-        y: (e.clientY - rect.top) / scaleY
-    };
+    var c = getClientCoords(e);
+    var pos = getCanvasPos(c.x, c.y);
     points.push({ x: pos.x, y: pos.y });
     smoothBuffer.push({ x: pos.x, y: pos.y });
     drawStroke();
