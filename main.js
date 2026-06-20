@@ -105,7 +105,12 @@ function setupEventListeners() {
     // Sliders
     bindSlider('size-slider', function(v) { brushSize = parseInt(v); });
     bindSlider('opacity-slider', function(v) { brushOpacity = parseInt(v) / 100; });
-    bindSlider('stabilization-slider', function(v) { stabilizationLevel = parseInt(v); });
+    bindSlider('stabilization-slider', function(v) {
+        stabilizationLevel = parseInt(v);
+        var valSpan = document.getElementById('stabilization-slider-val');
+        if (valSpan) valSpan.textContent = v;
+        showToast('Estabilización: ' + v);
+    });
 
     // Brush studio sliders
     bindSlider('brush-spacing', function(v) { currentBrushConfig.spacing = parseInt(v); document.getElementById('brush-spacing-val').textContent = v; });
@@ -423,13 +428,13 @@ function handlePointerMove(e) {
     var pos = getCanvasPos(c.x, c.y);
     points.push({ x: pos.x, y: pos.y });
 
-    // Stabilization: exponential moving average
+    // Stabilization: exponential moving average (aggressive)
     if (stabilizationLevel > 0 && smoothBuffer.length > 0) {
         var last = smoothBuffer[smoothBuffer.length - 1];
         var dx = pos.x - last.x;
         var dy = pos.y - last.y;
-        // EMA weight: level 0 = 1 (raw), level 100 = ~0.08 (heavy)
-        var weight = Math.max(0.08, 1 - stabilizationLevel / 108);
+        // weight: level 0 = 1 (raw), level 100 = 0.05 (extreme lag)
+        var weight = Math.max(0.05, 1 - stabilizationLevel / 105);
         smoothBuffer.push({
             x: last.x + dx * weight,
             y: last.y + dy * weight
@@ -778,6 +783,8 @@ function newProject() {
 function setupUI() {
     updateColorIndicator();
     loadRecentColors();
+    var stabSpan = document.getElementById('stabilization-slider-val');
+    if (stabSpan) stabSpan.textContent = stabilizationLevel;
 }
 
 function updateColorIndicator() {

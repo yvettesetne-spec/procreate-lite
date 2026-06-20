@@ -42,8 +42,9 @@
                     <input type="range" id="size-slider" min="1" max="100" value="10" orient="vertical" class="vertical-slider" aria-label="Tamaño de pincel">
                 </div>
                 
-                <div class="slider-container">
+                <div class="slider-container" style="position:relative;">
                     <input type="range" id="stabilization-slider" min="0" max="100" value="5" orient="vertical" class="vertical-slider stabilization-slider" title="Estabilización" aria-label="Estabilización">
+                    <span id="stabilization-slider-val" style="font-size:9px;color:var(--text-secondary);text-align:center;margin-top:-22px;">5</span>
                 </div>
                 
                 <div class="undo-redo-container" role="toolbar" aria-label="Deshacer/rehacer">
