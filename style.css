@@ -195,7 +195,8 @@ body, html {
 }
 .tool-btn-style.active {
     color: var(--icon-active);
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.18);
+    border-bottom: 2px solid var(--accent-color);
 }
 .tool-btn-style:hover {
     background-color: rgba(255, 255, 255, 0.08);

@@ -70,7 +70,10 @@ function bindClick(id, fn) {
     var el = document.getElementById(id);
     if (el) {
         el.addEventListener('click', fn);
-        el.addEventListener('touchend', function(e) { e.preventDefault(); fn(); });
+        el.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            fn();
+        });
     }
 }
 
@@ -297,7 +300,12 @@ function setMode(mode) {
     currentMode = mode;
     document.querySelectorAll('.tool-btn, .tool-btn-style').forEach(function(btn) { btn.classList.remove('active'); });
     var btn = document.getElementById('btn-' + mode);
-    if (btn) btn.classList.add('active');
+    if (btn) {
+        btn.classList.add('active');
+        showToast('Modo: ' + mode.charAt(0).toUpperCase() + mode.slice(1));
+    } else {
+        showToast('Error: boton no encontrado');
+    }
 }
 
 function handlePointerDown(e) {
