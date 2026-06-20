@@ -117,12 +117,6 @@ function setupEventListeners() {
     canvasContainer.addEventListener('touchend', handlePointerUp);
     canvasContainer.addEventListener('touchcancel', function() { isDrawing = false; });
 
-    // DEBUG: log all pointer/touch events on document
-    function evLog(prefix) { return function(e) { showToast('→ ' + prefix + ' id=' + e.target.id + ' tag=' + e.target.tagName + ' type=' + (e.pointerType || '')); }; }
-    function evLogTouch(prefix) { return function(e) { showToast('→ ' + prefix + ' id=' + e.target.id + ' tag=' + e.target.tagName + ' touches=' + e.touches.length); }; }
-    document.addEventListener('pointerdown', evLog('PD'));
-    document.addEventListener('touchstart', evLogTouch('TS'));
-
     // Layer actions
     bindClick('btn-add-layer', addLayerAction);
     bindClick('btn-delete-layer', deleteLayerAction);
@@ -335,9 +329,6 @@ function handlePointerDown(e) {
     if (e.pointerType === 'touch') return;
     var c = getClientCoords(e);
     var pos = getCanvasPos(c.x, c.y);
-    var r = canvasContainer.getBoundingClientRect();
-    showToast('C: ' + Math.round(pos.x) + ',' + Math.round(pos.y) + ' | Rect: l=' + Math.round(r.left) + ' t=' + Math.round(r.top) + ' w=' + Math.round(r.width) + ' h=' + Math.round(r.height), 4000);
-    if (!isDrawing) showToast('INICIO');
     isDrawing = true;
     points = [{ x: pos.x, y: pos.y }];
     smoothBuffer = [{ x: pos.x, y: pos.y }];
@@ -646,7 +637,7 @@ function updateColorIndicator() {
 }
 
 // === Toast / Alert ===
-function showToast(msg, duration) {
+function showToast(msg) {
     var el = document.getElementById('toast-message');
     if (!el) {
         el = document.createElement('div');
@@ -657,7 +648,7 @@ function showToast(msg, duration) {
     el.textContent = msg;
     el.style.opacity = '1';
     clearTimeout(el._timeout);
-    el._timeout = setTimeout(function() { el.style.opacity = '0'; }, duration || 2000);
+    el._timeout = setTimeout(function() { el.style.opacity = '0'; }, 2000);
 }
 
 function showAlert(title, message) {
