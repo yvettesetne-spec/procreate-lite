@@ -111,11 +111,17 @@ function setupEventListeners() {
     canvasContainer.addEventListener('pointerup', handlePointerUp);
     canvasContainer.addEventListener('pointerleave', function() { isDrawing = false; });
     canvasContainer.addEventListener('pointercancel', function() { isDrawing = false; });
-    // Touch events fallback (finger / generic capacitive stylus on iOS)
+    // Touch events for finger & generic capacitive stylus on iOS
     canvasContainer.addEventListener('touchstart', handlePointerDown);
     canvasContainer.addEventListener('touchmove', handlePointerMove);
     canvasContainer.addEventListener('touchend', handlePointerUp);
     canvasContainer.addEventListener('touchcancel', function() { isDrawing = false; });
+
+    // DEBUG: log all pointer/touch events on document
+    function evLog(prefix) { return function(e) { showToast('→ ' + prefix + ' id=' + e.target.id + ' tag=' + e.target.tagName + ' type=' + (e.pointerType || '')); }; }
+    function evLogTouch(prefix) { return function(e) { showToast('→ ' + prefix + ' id=' + e.target.id + ' tag=' + e.target.tagName + ' touches=' + e.touches.length); }; }
+    document.addEventListener('pointerdown', evLog('PD'));
+    document.addEventListener('touchstart', evLogTouch('TS'));
 
     // Layer actions
     bindClick('btn-add-layer', addLayerAction);
@@ -331,6 +337,7 @@ function handlePointerDown(e) {
     var pos = getCanvasPos(c.x, c.y);
     var r = canvasContainer.getBoundingClientRect();
     showToast('C: ' + Math.round(pos.x) + ',' + Math.round(pos.y) + ' | Rect: l=' + Math.round(r.left) + ' t=' + Math.round(r.top) + ' w=' + Math.round(r.width) + ' h=' + Math.round(r.height), 4000);
+    if (!isDrawing) showToast('INICIO');
     isDrawing = true;
     points = [{ x: pos.x, y: pos.y }];
     smoothBuffer = [{ x: pos.x, y: pos.y }];
