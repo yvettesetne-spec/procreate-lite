@@ -14,6 +14,7 @@ var brushColor = '#ffffff';
 var isDrawing = false;
 var points = [];
 var smoothBuffer = [];
+var predPoints = [];
 var canvasContainer;
 const MAX_LAYERS = 30;
 var layerIdCounter = 1;
@@ -332,6 +333,7 @@ function handlePointerDown(e) {
     isDrawing = true;
     points = [{ x: pos.x, y: pos.y }];
     smoothBuffer = [{ x: pos.x, y: pos.y }];
+    predPoints = [{ x: pos.x, y: pos.y, t: performance.now() }];
     saveUndoState();
 }
 
@@ -340,9 +342,13 @@ function handlePointerMove(e) {
     if (!isDrawing) return;
     var c = getClientCoords(e);
     var pos = getCanvasPos(c.x, c.y);
+    var now = performance.now();
     points.push({ x: pos.x, y: pos.y });
     smoothBuffer.push({ x: pos.x, y: pos.y });
+    predPoints.push({ x: pos.x, y: pos.y, t: now });
+    if (predPoints.length > 4) predPoints.shift();
     drawStroke();
+    drawPredicted(now);
 }
 
 function handlePointerUp() {
@@ -350,8 +356,28 @@ function handlePointerUp() {
     isDrawing = false;
     points = [];
     smoothBuffer = [];
+    predPoints = [];
     var layer = layers[activeLayerIndex];
     if (layer) layer.ctx.beginPath();
+}
+
+function drawPredicted(now) {
+    if (predPoints.length < 2) return;
+    var layer = layers[activeLayerIndex];
+    if (!layer) return;
+    var p1 = predPoints[predPoints.length - 2];
+    var p2 = predPoints[predPoints.length - 1];
+    var dt = (p2.t - p1.t) / 1000;
+    if (dt < 0.001) return;
+    var vx = (p2.x - p1.x) / dt;
+    var vy = (p2.y - p1.y) / dt;
+    var lookAhead = 0.04;
+    var predX = p2.x + vx * lookAhead;
+    var predY = p2.y + vy * lookAhead;
+    layer.ctx.beginPath();
+    layer.ctx.moveTo(p2.x, p2.y);
+    layer.ctx.lineTo(predX, predY);
+    layer.ctx.stroke();
 }
 
 function drawStroke() {
